@@ -1,0 +1,12 @@
+{
+    "authors": [
+        "Grim Maple"
+    ],
+    "copyright": "Copyright © 2021, Grim Maple",
+    "dependencies": {
+        "dlangui": "~>0.9.186"
+    },
+    "description": "Keyboard Input Visualization Program",
+    "license": "MIT",
+    "name": "dboard"
+}
