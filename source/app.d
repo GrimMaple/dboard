@@ -1,6 +1,10 @@
 import std.stdio;
+import std.json;
+import std.conv : to;
 
 import dlangui;
+import dlangui.dialogs.dialog;
+import dlangui.dialogs.filedlg;
 
 import keyboard;
 import keystrings;
@@ -10,8 +14,8 @@ mixin APP_ENTRY_POINT;
 int code = 0;
 KeyState gstate = KeyState.Up;
 
-immutable keySize = 48;
-immutable keyOffset = 3;
+int keySize = 48;
+int keyOffset = 3;
 
 bool[] keys = new bool[256];
 
@@ -113,34 +117,137 @@ void resetDragProperties()
     dragBottom = false;
 }
 
-extern(C) int UIAppMain()
+string saveJson()
 {
-    keysDisp[0].keyCode = 0x70;
-    keysDisp[0].visibleString = "F1";
+    JSONValue toValue(ref KeyDisplay disp)
+    {
+        JSONValue val;
+        val["locx"] = disp.locx;
+        val["locy"] = disp.locy;
+        val["h"] = disp.h;
+        val["w"] = disp.w;
+        val["keyCode"] = disp.keyCode;
+        if(disp.str != "")
+            val["str"] = disp.str;
+        return val;
+    }
+    JSONValue res;
+    res["keySize"] = keySize;
+    res["keyOffset"] = keyOffset;
+    JSONValue[] vals = new JSONValue[0];
+    foreach (ref key; keysDisp)
+    {
+        vals ~= toValue(key);
+    }
+    res["keys"] = vals;
+    return toJSON(res, true);
+}
 
-    keysDisp[1].keyCode = 0x51;
-    keysDisp[1].locx = 2.5;
+void loadJsonFile(string json)
+{
+    keysDisp = new KeyDisplay[0];
+    auto parsed = parseJSON(json);
+    keySize = parsed["keySize"].get!int();
+    keyOffset = parsed["keyOffset"].get!int();
+    auto keys = parsed["keys"].get!(JSONValue[])();
+    foreach(val; keys)
+    {
+        KeyDisplay disp;
+        disp.h = val["h"].get!float();
+        disp.w = val["w"].get!float();
+        disp.keyCode = val["keyCode"].get!int();
+        disp.locx = val["locx"].get!float();
+        disp.locy = val["locy"].get!float();
+        try
+        {
+            disp.str = to!dstring(val["str"].get!string());
+        }
+        catch(Exception e)
+        {
+            // it's okay to be missing str property
+        }
+        keysDisp ~= [disp];
+    }
+}
 
-    keysDisp[2].keyCode = 0x57;
-    keysDisp[2].locx = 1;
-    keysDisp[2].w = 1.5;
-
-    keysDisp[3].keyCode = 0x45;
-    keysDisp[3].locx = 3.5;
-    keysDisp[3].w = 1.5;
-
-    keysDisp[4].keyCode = 0x52;
-    keysDisp[4].locx = 5;
-    keysDisp[4].w = 1;
-
-    immutable str = "QWERTYUIOP";
-    Window window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
-    window.show();
-    keys[] = false;
-
-    CanvasWidget canvas = new CanvasWidget("canvas");
-
+MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
+{
+    if(editMode)
+    {
+        return constructMainMenuInEditing(w, c);
+    }
     MenuItem mainMenu = new MenuItem();
+    mainMenu.clear();
+    MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
+    MenuItem load = new MenuItem(new Action(2, "Load file"d));
+    MenuItem save = new MenuItem(new Action(3, "Save file"d));
+    mainMenu.add(sub);
+    sub.menuItemClick = delegate(MenuItem item)
+    {
+        editMode = !editMode;
+        if(editMode)
+        {
+            c.popupMenu =  constructMainMenuInEditing(w, c);
+        }
+        else
+        {
+           c.popupMenu = constructMainMenu(w, c);
+        }
+        return true;
+    };
+
+    load.menuItemClick = delegate(MenuItem item)
+    {
+        FileDialog dlg = new FileDialog(UIString("Open file"d), w, null);
+        dlg.addFilter(FileFilterEntry(UIString("JSON Files (*.json)"d), "*.json"));
+        dlg.dialogResult = delegate(Dialog dialog, const Action result)
+        {
+            import std.file : readText;
+            if(result.id != ACTION_OPEN.id)
+                return;
+            string filename = dlg.filename;
+            string json = readText(filename);
+            loadJsonFile(json);
+            c.invalidate();
+            w.invalidate();
+        };
+        dlg.show();
+        return true;
+    };
+
+    save.menuItemClick = delegate(MenuItem item)
+    {
+        FileDialog dlg = new FileDialog(UIString("Save file"d), w, null, DialogFlag.Modal | DialogFlag.Resizable
+            | FileDialogFlag.ConfirmOverwrite | FileDialogFlag.Save);
+        dlg.addFilter(FileFilterEntry(UIString("JSON Files (*.json)"d), "*.json"));
+        dlg.filename = "mykeyboard";
+        dlg.dialogResult = delegate(Dialog dialog, const Action result)
+        {
+            import std.file : write;
+            import std.algorithm : endsWith;
+            if(result.id != ACTION_SAVE.id)
+                return;
+            auto ext = dlg.selectedFilter()[0][1 .. $];
+            string filename = dlg.filename;
+            if(!filename.endsWith(ext))
+                filename ~= ext;
+            string json = saveJson();
+            write(filename, json);
+            c.invalidate();
+            w.invalidate();
+        };
+        dlg.show();
+        return true;
+    };
+    mainMenu.add(load);
+    mainMenu.add(save);
+    return mainMenu;
+}
+
+MenuItem constructMainMenuInEditing(ref Window w, ref CanvasWidget c)
+{
+    MenuItem mainMenu = new MenuItem();
+    mainMenu.clear();
     MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
     MenuItem subAdd = new MenuItem(new Action(1, "Add new"d));
     mainMenu.add(sub);
@@ -149,28 +256,77 @@ extern(C) int UIAppMain()
         editMode = !editMode;
         if(editMode)
         {
-            mainMenu.add(subAdd);
+            c.popupMenu = constructMainMenuInEditing(w, c);
         }
         else
         {
-            mainMenu.clear();
-            mainMenu.add(sub);
+            c.popupMenu = constructMainMenu(w, c);
         }
         return true;
     };
-
     subAdd.menuItemClick = delegate(MenuItem item)
     {
         addMode = true;
         return true;
     };
+    mainMenu.add(subAdd);
+    
+    return mainMenu;
+}
 
-    canvas.popupMenu = mainMenu;
+extern(C) int UIAppMain()
+{
+    string testJson = 
+    `{
+        "keySize": 48,
+        "keyOffset": 3,
+        "keys": [
+            {
+                "locx": 1,
+                "locy": 0,
+                "w": 1,
+                "h": 1,
+                "keyCode": 87
+            },
+            {
+                "locx": 0,
+                "locy": 1,
+                "w": 1,
+                "h": 1,
+                "keyCode": 65
+            },
+            {
+                "locx": 1,
+                "locy": 1,
+                "w": 1,
+                "h": 1,
+                "keyCode": 83
+            },
+            {
+                "locx": 2,
+                "locy": 1,
+                "w": 1,
+                "h": 1,
+                "keyCode": 68
+            }
+        ]
+    }`;
+
+    loadJsonFile(testJson);
+
+    immutable str = "QWERTYUIOP";
+    Window window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
+    window.show();
+    keys[] = false;
+
+    CanvasWidget canvas = new CanvasWidget("canvas");
+
+    canvas.popupMenu = constructMainMenu(window, canvas);
 
     canvas.mouseEvent = delegate(Widget source, MouseEvent event)
     {
         import std.math : abs;
-        canvas.popupMenu = mainMenu;
+        canvas.popupMenu = constructMainMenu(window, canvas);
         if(!editMode)
         {
             return false;
@@ -276,12 +432,15 @@ extern(C) int UIAppMain()
                     del.menuItemClick = delegate(MenuItem item)
                     {
                         keysDisp = keysDisp[0 .. i] ~ keysDisp[i+1 .. $];
-                        canvas.popupMenu = mainMenu;
+                        canvas.popupMenu = constructMainMenu(window, canvas);
                         return true;
                     };
                     itm.add(del);
-                    canvas.popupMenu = itm;
-                    canvas.showPopupMenu(event.x, event.y);
+                    if(canvas.canShowPopupMenu(event.x, event.y))
+                    {
+                        canvas.popupMenu = itm;
+                        canvas.showPopupMenu(event.x, event.y);
+                    }
                 }
                 resetDragProperties();
                 drag = &disp;
@@ -305,6 +464,7 @@ extern(C) int UIAppMain()
         import std.conv : to;
         buf.fill(0x00FF00);
 
+        c.fontFace = "Arial";// = FontManager.instance.getFont(24, 300, false, FontFamily.Serif, "Arial");
         void drawDisp(ref KeyDisplay disp, uint color)
         {
             auto s = disp.visibleString;
@@ -346,8 +506,6 @@ extern(C) int UIAppMain()
         {
             drawDisp(n, 0x99999999);
         }
-
-        c.font.drawText(buf, 100, 100, to!dstring(code) ~ " " ~ to!dstring(gstate), 0x0);
     };
 
     window.mainWidget = canvas;
