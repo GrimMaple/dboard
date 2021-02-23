@@ -1,6 +1,6 @@
 # DBoard - Kyboard Visualisation Software in D
 
-This is an attempt to create a convenient keyboard visualization software. Convenient means easy to use, so the main feature is visual keyboard editor.
+This is an attempt to create a convenient keyboard visualization software. Convenient means easy to use, so the main feature is visual keyboard editor.  
 ![Preview](https://raw.githubusercontent.com/GrimMaple/dboard/master/preview.gif)
 
 Currently missing a few features, it's already useable for most parts.
