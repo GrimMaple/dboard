@@ -8,16 +8,19 @@ import dlangui.dialogs.filedlg;
 
 import keyboard;
 import keystrings;
+import ui;
+import keys;
+import io;
 
 mixin APP_ENTRY_POINT;
 
 int code = 0;
 KeyState gstate = KeyState.Up;
 
-int keySize = 48;
-int keyOffset = 3;
+//int keySize = 48;
+//int keyOffset = 3;
 
-bool[] keys = new bool[256];
+bool[] keysStates = new bool[256];
 
 bool isWhole(float f)
 {
@@ -26,33 +29,11 @@ bool isWhole(float f)
     return true;
 }
 
-struct KeyDisplay
-{
-    float locx = 0, locy = 0;
-    int keyCode = 0;
-    float w = 1, h = 1;
-
-    @property void visibleString(dstring str)
-    {
-        this.str = str;
-    }
-
-    @property dstring visibleString()
-    {
-        import std.conv : to;
-        if(str == "")
-            return keyStrings[keyCode];
-        return str;
-    }
-
-    private dstring str;
-}
-
 KeyDisplay temporary;
 
-bool editMode = false;
+//bool editMode = false;
 
-KeyDisplay[] keysDisp = new KeyDisplay[5];
+// KeyDisplay[] keysDisp = new KeyDisplay[5];
 
 enum KeyEnd
 {
@@ -67,7 +48,7 @@ bool dragBottom = false;
 KeyDisplay* drag = null;
 
 KeyDisplay n;
-bool addMode = false;
+//bool addMode = false;
 
 bool hasOffset = false;
 int xoffs = 0, yoffs = 0;
@@ -117,207 +98,14 @@ void resetDragProperties()
     dragBottom = false;
 }
 
-string saveJson()
-{
-    JSONValue toValue(ref KeyDisplay disp)
-    {
-        JSONValue val;
-        val["locx"] = disp.locx;
-        val["locy"] = disp.locy;
-        val["h"] = disp.h;
-        val["w"] = disp.w;
-        val["keyCode"] = disp.keyCode;
-        if(disp.str != "")
-            val["str"] = disp.str;
-        return val;
-    }
-    JSONValue res;
-    res["keySize"] = keySize;
-    res["keyOffset"] = keyOffset;
-    JSONValue[] vals = new JSONValue[0];
-    foreach (ref key; keysDisp)
-    {
-        vals ~= toValue(key);
-    }
-    res["keys"] = vals;
-    return toJSON(res, true);
-}
-
-void loadJsonFile(string json)
-{
-    keysDisp = new KeyDisplay[0];
-    auto parsed = parseJSON(json);
-    keySize = parsed["keySize"].get!int();
-    keyOffset = parsed["keyOffset"].get!int();
-    auto keys = parsed["keys"].get!(JSONValue[])();
-    foreach(val; keys)
-    {
-        KeyDisplay disp;
-        disp.h = val["h"].get!float();
-        disp.w = val["w"].get!float();
-        disp.keyCode = val["keyCode"].get!int();
-        disp.locx = val["locx"].get!float();
-        disp.locy = val["locy"].get!float();
-        try
-        {
-            disp.str = to!dstring(val["str"].get!string());
-        }
-        catch(Exception e)
-        {
-            // it's okay to be missing str property
-        }
-        keysDisp ~= [disp];
-    }
-}
-
-MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
-{
-    if(editMode)
-    {
-        return constructMainMenuInEditing(w, c);
-    }
-    MenuItem mainMenu = new MenuItem();
-    mainMenu.clear();
-    MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
-    MenuItem load = new MenuItem(new Action(2, "Load file"d));
-    MenuItem save = new MenuItem(new Action(3, "Save file"d));
-    mainMenu.add(sub);
-    sub.menuItemClick = delegate(MenuItem item)
-    {
-        editMode = !editMode;
-        if(editMode)
-        {
-            c.popupMenu =  constructMainMenuInEditing(w, c);
-        }
-        else
-        {
-           c.popupMenu = constructMainMenu(w, c);
-        }
-        return true;
-    };
-
-    load.menuItemClick = delegate(MenuItem item)
-    {
-        FileDialog dlg = new FileDialog(UIString("Open file"d), w, null);
-        dlg.addFilter(FileFilterEntry(UIString("JSON Files (*.json)"d), "*.json"));
-        dlg.dialogResult = delegate(Dialog dialog, const Action result)
-        {
-            import std.file : readText;
-            if(result.id != ACTION_OPEN.id)
-                return;
-            string filename = dlg.filename;
-            string json = readText(filename);
-            loadJsonFile(json);
-            c.invalidate();
-            w.invalidate();
-        };
-        dlg.show();
-        return true;
-    };
-
-    save.menuItemClick = delegate(MenuItem item)
-    {
-        FileDialog dlg = new FileDialog(UIString("Save file"d), w, null, DialogFlag.Modal | DialogFlag.Resizable
-            | FileDialogFlag.ConfirmOverwrite | FileDialogFlag.Save);
-        dlg.addFilter(FileFilterEntry(UIString("JSON Files (*.json)"d), "*.json"));
-        dlg.filename = "mykeyboard";
-        dlg.dialogResult = delegate(Dialog dialog, const Action result)
-        {
-            import std.file : write;
-            import std.algorithm : endsWith;
-            if(result.id != ACTION_SAVE.id)
-                return;
-            auto ext = dlg.selectedFilter()[0][1 .. $];
-            string filename = dlg.filename;
-            if(!filename.endsWith(ext))
-                filename ~= ext;
-            string json = saveJson();
-            write(filename, json);
-            c.invalidate();
-            w.invalidate();
-        };
-        dlg.show();
-        return true;
-    };
-    mainMenu.add(load);
-    mainMenu.add(save);
-    return mainMenu;
-}
-
-MenuItem constructMainMenuInEditing(ref Window w, ref CanvasWidget c)
-{
-    MenuItem mainMenu = new MenuItem();
-    mainMenu.clear();
-    MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
-    MenuItem subAdd = new MenuItem(new Action(1, "Add new"d));
-    mainMenu.add(sub);
-    sub.menuItemClick = delegate(MenuItem item)
-    {
-        editMode = !editMode;
-        if(editMode)
-        {
-            c.popupMenu = constructMainMenuInEditing(w, c);
-        }
-        else
-        {
-            c.popupMenu = constructMainMenu(w, c);
-        }
-        return true;
-    };
-    subAdd.menuItemClick = delegate(MenuItem item)
-    {
-        addMode = true;
-        return true;
-    };
-    mainMenu.add(subAdd);
-    
-    return mainMenu;
-}
-
 extern(C) int UIAppMain()
 {
-    string testJson = 
-    `{
-        "keySize": 48,
-        "keyOffset": 3,
-        "keys": [
-            {
-                "locx": 1,
-                "locy": 0,
-                "w": 1,
-                "h": 1,
-                "keyCode": 87
-            },
-            {
-                "locx": 0,
-                "locy": 1,
-                "w": 1,
-                "h": 1,
-                "keyCode": 65
-            },
-            {
-                "locx": 1,
-                "locy": 1,
-                "w": 1,
-                "h": 1,
-                "keyCode": 83
-            },
-            {
-                "locx": 2,
-                "locy": 1,
-                "w": 1,
-                "h": 1,
-                "keyCode": 68
-            }
-        ]
-    }`;
-
-    loadJsonFile(testJson);
+    keysDisp = loadJsonFile(testJson);
 
     immutable str = "QWERTYUIOP";
     Window window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
     window.show();
-    keys[] = false;
+    keysStates[] = false;
 
     CanvasWidget canvas = new CanvasWidget("canvas");
 
@@ -356,10 +144,16 @@ extern(C) int UIAppMain()
             }
             else if(dragLeft)
             {
+                immutable save = drag.locx;
+                drag.locx = threeWayRound(getGridLoc(event.x));
+                drag.w = threeWayRound(drag.w + (save - drag.locx)); // Increase the width of the visible item
                 return true;
             }
             else if(dragTop)
             {
+                immutable save = drag.locy;
+                drag.locy = threeWayRound(getGridLoc(event.y));
+                drag.h = threeWayRound(drag.h + (save - drag.locy)); // Increase the width of visible item
                 return true;
             }
             else if(dragBottom)
@@ -498,7 +292,7 @@ extern(C) int UIAppMain()
         {
             import std.math : ceil;
             immutable  idx = keysDisp[i].keyCode;
-            immutable color = keys[idx] ? 0xCCCCCC : 0x777777;
+            immutable color = keysStates[idx] ? 0xCCCCCC : 0x777777;
             drawDisp(keysDisp[i], color);
         }
 
@@ -524,7 +318,7 @@ extern(C) int UIAppMain()
             }
         }
         code = vkCode;
-        keys[code] = (state == KeyState.Down) ? true : false;
+        keysStates[code] = (state == KeyState.Down) ? true : false;
         gstate = state;
         canvas.invalidate();
         window.invalidate();
