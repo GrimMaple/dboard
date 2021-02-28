@@ -34,4 +34,4 @@ jobs:
       - name: 'Build'
         run: |
           # Build the project, with its main file included, without unittests
-          dub build --compiler=$DC
+          dub build
