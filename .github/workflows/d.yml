@@ -20,7 +20,7 @@ jobs:
           - ldc-latest
           - dmd-latest
         
-    runs-on: {{matrix.os}}
+    runs-on: ${{matrix.os}}
 
     steps:
       - name: Setup D compiler
