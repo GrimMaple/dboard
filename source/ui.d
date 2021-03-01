@@ -27,6 +27,7 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
     MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
     MenuItem load = new MenuItem(new Action(2, "Load file"d));
     MenuItem save = new MenuItem(new Action(3, "Save file"d));
+    MenuItem sett = new MenuItem(new Action(4, "Settings"d));
     mainMenu.add(sub);
     sub.menuItemClick = delegate(MenuItem item)
     {
@@ -85,9 +86,62 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
         dlg.show();
         return true;
     };
+
+    sett.menuItemClick = delegate(MenuItem item)
+    {
+        //w.mainWidget = constructSettingsWidget(w);
+        constructSettingsWidget(w);
+        return true;
+    };
+
     mainMenu.add(load);
     mainMenu.add(save);
+    mainMenu.add(sett);
     return mainMenu;
+}
+
+auto constructSettingsWidget(ref Window w)
+{
+    import std.conv : to;
+    Window wnd = Platform.instance.createWindow("DBoard settings", null, WindowFlag.Resizable, 400, 200);
+    HorizontalLayout main = new HorizontalLayout();
+    main.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
+    GroupBox sizes = new GroupBox("sizes", "Sizes"d);
+    sizes.layoutWidth(FILL_PARENT);
+    EditLine widthEdit = new EditLine();
+    widthEdit.layoutWidth(40);
+    widthEdit.text = to!dstring(keySize);
+
+    EditLine spacingEdit = new EditLine();
+    spacingEdit.text = to!dstring(keyOffset);
+
+    Button apply = new Button("apply", "Apply"d);
+    apply.click = delegate(Widget widg)
+    {
+        try
+        {
+            keySize = to!int(widthEdit.text);
+            keyOffset = to!int(spacingEdit.text);
+        }
+        catch(Exception ex)
+        {
+            wnd.showMessageBox("Error"d, "Please enter number!"d);
+        }
+        w.invalidate();
+        //w.updateWindowOrContentSize();
+        return true;
+    };
+
+    spacingEdit.layoutWidth(40);
+    sizes.addChild(new TextWidget("wText", "Side size (px)"d));
+    sizes.addChild(widthEdit);
+    sizes.addChild(new TextWidget("oText", "Key offset size (px)"d));
+    sizes.addChild(spacingEdit);
+    sizes.addChild(apply);
+    main.addChild(sizes);
+    wnd.mainWidget = main;
+    wnd.show();
+    return main;
 }
 
 MenuItem constructMainMenuInEditing(ref Window w, ref CanvasWidget c)
