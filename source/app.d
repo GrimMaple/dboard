@@ -145,15 +145,17 @@ extern(C) int UIAppMain()
             else if(dragLeft)
             {
                 immutable save = drag.locx;
+                immutable locxx = drag.locx + drag.w;
                 drag.locx = threeWayRound(getGridLoc(event.x));
-                drag.w = threeWayRound(drag.w + (save - drag.locx)); // Increase the width of the visible item
+                drag.w = locxx - drag.locx; // Increase the width of the visible item
                 return true;
             }
             else if(dragTop)
             {
                 immutable save = drag.locy;
+                immutable locyy = drag.locy + drag.h;
                 drag.locy = threeWayRound(getGridLoc(event.y));
-                drag.h = threeWayRound(drag.h + (save - drag.locy)); // Increase the width of visible item
+                drag.h = locyy - drag.locy; // Increase the width of visible item
                 return true;
             }
             else if(dragBottom)
