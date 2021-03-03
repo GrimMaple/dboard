@@ -229,30 +229,24 @@ extern(C) int UIAppMain()
             if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
                withinGridRange(event.x, disp.locx, disp.locx + disp.w))
             {
-                if(event.rbutton.isDown)
+                MenuItem itm = new MenuItem();
+                MenuItem del = new MenuItem(new Action(0, "Delete"d));
+                del.menuItemClick = delegate(MenuItem item)
                 {
-                    MenuItem itm = new MenuItem();
-                    MenuItem del = new MenuItem(new Action(0, "Delete"d));
-                    del.menuItemClick = delegate(MenuItem item)
-                    {
-                        keysDisp = keysDisp[0 .. i] ~ keysDisp[i+1 .. $];
-                        canvas.popupMenu = constructMainMenu(window, canvas);
-                        return true;
-                    };
-                    itm.add(del);
-                    if(canvas.canShowPopupMenu(event.x, event.y))
-                    {
-                        canvas.popupMenu = itm;
-                        canvas.showPopupMenu(event.x, event.y);
-                    }
-                }
+                    keysDisp = keysDisp[0 .. i] ~ keysDisp[i+1 .. $];
+                    canvas.popupMenu = constructMainMenu(window, canvas);
+                    return true;
+                };
+                itm.add(del);
+                canvas.popupMenu = itm;
                 resetDragProperties();
                 drag = &disp;
                 window.overrideCursorType(CursorType.SizeAll);
-                return true;
+                return false;
             }
         }
         resetDragProperties();
+        canvas.popupMenu = constructMainMenu(window, canvas);
         window.overrideCursorType(CursorType.Arrow);
         return false;
     };

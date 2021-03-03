@@ -209,6 +209,14 @@ MenuItem constructMainMenuInEditing(ref Window w, ref CanvasWidget c)
         return true;
     };
     mainMenu.add(subAdd);
+
+    MenuItem clear = new MenuItem(new Action(666, "Clear"d));
+    clear.menuItemClick = delegate(MenuItem itm)
+    {
+        keysDisp = new KeyDisplay[0];
+        return true;
+    };
+    mainMenu.add(clear);
     
     return mainMenu;
 }
