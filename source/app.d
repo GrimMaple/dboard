@@ -6,6 +6,8 @@ import dlangui;
 import dlangui.dialogs.dialog;
 import dlangui.dialogs.filedlg;
 
+import mud.config;
+
 import keyboard;
 import keystrings;
 import ui;
@@ -17,9 +19,6 @@ mixin APP_ENTRY_POINT;
 int code = 0;
 KeyState gstate = KeyState.Up;
 
-//int keySize = 48;
-//int keyOffset = 3;
-
 bool[] keysStates = new bool[256];
 
 bool isWhole(float f)
@@ -30,10 +29,6 @@ bool isWhole(float f)
 }
 
 KeyDisplay temporary;
-
-//bool editMode = false;
-
-// KeyDisplay[] keysDisp = new KeyDisplay[5];
 
 enum KeyEnd
 {
@@ -48,7 +43,6 @@ bool dragBottom = false;
 KeyDisplay* drag = null;
 
 KeyDisplay n;
-//bool addMode = false;
 
 bool hasOffset = false;
 int xoffs = 0, yoffs = 0;
@@ -88,6 +82,21 @@ float threeWayRound(float input)
     return input;
 }
 
+void loadPreferences()
+{
+    import std.file : exists, readText;
+    if(exists("prefs"))
+        deserializeConfig(prefs, "prefs");
+
+    if(prefs.lastJson != "")
+        keysDisp = loadJsonFile(readText(prefs.lastJson));
+}
+
+void storePreferences()
+{
+    serializeConfig(prefs, "prefs");
+}
+
 void resetDragProperties()
 {
     drag = null;
@@ -100,8 +109,7 @@ void resetDragProperties()
 
 extern(C) int UIAppMain()
 {
-    keysDisp = loadJsonFile(testJson);
-
+    loadPreferences();
     immutable str = "QWERTYUIOP";
     Window window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
     window.show();
@@ -258,7 +266,7 @@ extern(C) int UIAppMain()
     canvas.onDrawListener = delegate(CanvasWidget c, DrawBuf buf, Rect rc)
     {
         import std.conv : to;
-        buf.fill(0x00FF00);
+        buf.fill(to!uint(prefs.keyColor, 16));
 
         c.fontFace = "Arial";// = FontManager.instance.getFont(24, 300, false, FontFamily.Serif, "Arial");
         void drawDisp(ref KeyDisplay disp, uint color)
@@ -325,5 +333,7 @@ extern(C) int UIAppMain()
         canvas.invalidate();
         window.invalidate();
     };
-    return Platform.instance.enterMessageLoop();
+    immutable res = Platform.instance.enterMessageLoop();
+    storePreferences();
+    return res;
 }

@@ -4,7 +4,8 @@
     ],
     "copyright": "Copyright © 2021, Grim Maple",
     "dependencies": {
-        "dlangui": "~>0.9.186"
+        "dlangui": "~>0.9.186",
+        "mud": "~>0.1.0"
     },
     "description": "Keyboard Input Visualization Program",
     "license": "MIT",

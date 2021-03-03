@@ -4,6 +4,8 @@ import dlangui;
 import dlangui.dialogs.filedlg;
 import dlangui.dialogs.dialog;
 
+import mud.config;
+
 import io;
 import keystrings;
 import keys;
@@ -15,6 +17,14 @@ __gshared int keySize = 48;
 __gshared int keyOffset = 3;
 
 __gshared KeyDisplay[] keysDisp = new KeyDisplay[0];
+
+struct Preferences
+{
+    @ConfigProperty() string lastJson;
+    @ConfigProperty() string keyColor = "00FF00";
+}
+
+__gshared Preferences prefs;
 
 MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
 {
@@ -54,6 +64,7 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
                 return;
             string filename = dlg.filename;
             string json = readText(filename);
+            prefs.lastJson = filename;
             loadJsonFile(json);
             c.invalidate();
             w.invalidate();
@@ -80,6 +91,7 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
                 filename ~= ext;
             string json = saveJson(keysDisp);
             write(filename, json);
+            prefs.lastJson = filename;
             c.invalidate();
             w.invalidate();
         };
@@ -89,7 +101,6 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
 
     sett.menuItemClick = delegate(MenuItem item)
     {
-        //w.mainWidget = constructSettingsWidget(w);
         constructSettingsWidget(w);
         return true;
     };
@@ -103,8 +114,8 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
 auto constructSettingsWidget(ref Window w)
 {
     import std.conv : to;
-    Window wnd = Platform.instance.createWindow("DBoard settings", null, WindowFlag.Resizable, 400, 200);
-    HorizontalLayout main = new HorizontalLayout();
+    Window wnd = Platform.instance.createWindow("DBoard settings", null, 0, 300, 200);
+    VerticalLayout main = new VerticalLayout();
     main.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
     GroupBox sizes = new GroupBox("sizes", "Sizes"d);
     sizes.layoutWidth(FILL_PARENT);
@@ -115,30 +126,58 @@ auto constructSettingsWidget(ref Window w)
     EditLine spacingEdit = new EditLine();
     spacingEdit.text = to!dstring(keyOffset);
 
-    Button apply = new Button("apply", "Apply"d);
-    apply.click = delegate(Widget widg)
-    {
-        try
-        {
-            keySize = to!int(widthEdit.text);
-            keyOffset = to!int(spacingEdit.text);
-        }
-        catch(Exception ex)
-        {
-            wnd.showMessageBox("Error"d, "Please enter number!"d);
-        }
-        w.invalidate();
-        //w.updateWindowOrContentSize();
-        return true;
-    };
-
     spacingEdit.layoutWidth(40);
     sizes.addChild(new TextWidget("wText", "Side size (px)"d));
     sizes.addChild(widthEdit);
     sizes.addChild(new TextWidget("oText", "Key offset size (px)"d));
     sizes.addChild(spacingEdit);
-    sizes.addChild(apply);
     main.addChild(sizes);
+
+    main.addChild(new TextWidget("cText", "Background color"d));
+    EditLine colorEdit = new EditLine();
+    colorEdit.text = to!dstring(prefs.keyColor);
+    main.addChild(colorEdit);
+
+    Button apply = new Button("apply", "Apply"d);
+    apply.click = delegate(Widget widg)
+    {
+        try
+        {
+            try
+            {
+                keySize = to!int(widthEdit.text);
+                keyOffset = to!int(spacingEdit.text);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Please enter number!");
+            }
+            if(colorEdit.text.length == 6)
+            {
+                foreach(ref k; colorEdit.text)
+                {
+                    import std.algorithm : any;
+                    if(!"0123456789ABCDEF"d.any!(a => a == k))
+                    {
+                        throw new Exception("Only 0-9 and A-F characters are accepted for color!");
+                    }
+                }
+                prefs.keyColor = to!string(colorEdit.text);
+            }
+            else
+            {
+                throw new Exception("Color must be 6 digits long!");
+            }
+        }
+        catch(Exception ex)
+        {
+            wnd.showMessageBox("Error"d, to!dstring(ex.message));
+        }
+        w.invalidate();
+        return true;
+    };
+    main.addChild(apply);
+
     wnd.mainWidget = main;
     wnd.show();
     return main;
