@@ -42,6 +42,10 @@ bool dragTop = false;
 bool dragBottom = false;
 KeyDisplay* drag = null;
 
+bool changingName = false;
+
+KeyDisplay* nameEditing = null;
+
 KeyDisplay n;
 
 bool hasOffset = false;
@@ -115,7 +119,31 @@ extern(C) int UIAppMain()
     window.show();
     keysStates[] = false;
 
+    VerticalLayout vl = new VerticalLayout();
+    vl.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
+
     CanvasWidget canvas = new CanvasWidget("canvas");
+
+    EditLine textEdit = new EditLine("editText");
+    textEdit.layoutHeight(30).layoutWidth(FILL_PARENT);
+    textEdit.visibility = Visibility.Invisible;
+
+    void cancelEditing()
+    {
+        if(nameEditing)
+        {
+            changingName = false;
+            vl.removeChild("editText");
+            nameEditing.visibleString = textEdit.text;
+            window.invalidate();
+        }
+    }
+
+    textEdit.enterKey = delegate(EditWidgetBase w)
+    {
+        cancelEditing();
+        return true;
+    };
 
     canvas.popupMenu = constructMainMenu(window, canvas);
 
@@ -141,8 +169,27 @@ extern(C) int UIAppMain()
             window.invalidate();
             return true;
         }
+        if(event.lbutton.doubleClick && !changingName)
+        {
+            foreach(i, ref disp; keysDisp)
+            {
+                if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
+                withinGridRange(event.x, disp.locx, disp.locx + disp.w))
+                {
+                        //window.showMessageBox("KEK"d, to!dstring(event.lbutton.doubleClick));
+                        vl.addChild(textEdit);
+                        textEdit.text = disp.visibleString();
+                        textEdit.visibility = Visibility.Visible;
+                        changingName = true;
+                        nameEditing = &disp;
+                        textEdit.setFocus();
+                        return true;
+                }
+            }
+        }
         if(event.lbutton.isDown)
         {
+            cancelEditing();
             if(dragRight)
             {
                 drag.w = threeWayRound(getGridLoc(event.x) - drag.locx);
@@ -229,6 +276,12 @@ extern(C) int UIAppMain()
             if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
                withinGridRange(event.x, disp.locx, disp.locx + disp.w))
             {
+                if(event.lbutton.isDown)
+                {
+                    window.showMessageBox("KEK"d, to!dstring(event.lbutton.doubleClick));
+                    vl.addChild(textEdit);
+                    return true;
+                }
                 MenuItem itm = new MenuItem();
                 MenuItem del = new MenuItem(new Action(0, "Delete"d));
                 del.menuItemClick = delegate(MenuItem item)
@@ -256,7 +309,7 @@ extern(C) int UIAppMain()
         return false;
     };
 
-    canvas.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
+    canvas.layoutWidth(FILL_PARENT).layoutHeight(400);
     canvas.onDrawListener = delegate(CanvasWidget c, DrawBuf buf, Rect rc)
     {
         import std.conv : to;
@@ -306,7 +359,10 @@ extern(C) int UIAppMain()
         }
     };
 
-    window.mainWidget = canvas;
+    vl.addChild(canvas);
+    //vl.addChild(textEdit);
+
+    window.mainWidget = vl;
 
     KeyHook.get().OnAction = (int vkCode, KeyState state)
     {
