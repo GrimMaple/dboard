@@ -6,12 +6,36 @@ This is an attempt to create a convenient keyboard visualization software. Conve
 Currently missing a few features, it's already useable for most parts.
 
 ## Explanation
-This softwares uses a tile-based grid to display keys for convenience purposes.  
-The software support uneven placements (eg 1.5) to provide more visualisation options.  
-Auto-snapping to whole and half locations are supported.
+DBoard uses a tile-based grid to display keys for convenience purposes.  
+DBoard supports uneven placements (eg 1.5) to provide more visualisation options.  
+Auto-snapping to whole and half locations is supported.
+
+## Usage  
+I tried to make DBoard as self-explanatory as possible, but here are a few things you can do.
+
+### Normal mode
+Right click to acces the context menu to enter "edit" mode, save/load keyboard configurations, or change global settings.  
+
+### Edit mode
+To add a new key:  
+* Right click and select "Add new"
+* Press desired key on the keyboard
+* Place the key on the grid and left click
+
+To delete a key, right click the key and press "Delete".  
+Drag the edges of any key to change its size.  
+Double click any key to change the display string of the key.  
+  
+It is currently *not possible* to change the key mapping. If you want to change key mapping, you have to delete and re-add a key.  
+
+### Global settings
+Global settings allow for changing the following appearance aspects:
+* Side size - changes key side size in pixels. 1 logical space is equal to this metric
+* Key offset size - the empty space (in pixel) between two keys
+* Background color = a HEX string in RRGGBB format representing DBoard's background color (for chroma key purposes)
 
 ## Saving/Loading
-This software saves keyboard files as plain json text. It can be edited afterwards to your liking.  
+DBoard saves keyboard files as plain json text. It can be edited afterwards to your liking.  
 Example json:
 ```json
 {
