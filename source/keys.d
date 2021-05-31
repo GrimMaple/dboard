@@ -20,7 +20,15 @@ struct KeyDisplay
 
     @property dstring visibleString()
     {
-        return hasVisibleString ? str : keyStrings[keyCode];
+        debug
+        {
+            import std.conv : toChars, to;
+            immutable s = keyCode;
+            dstring t = to!dstring(toChars!(16)(cast(uint)s));
+            return hasVisibleString ? str :
+                keyStrings[keyCode] == "" ? t : keyStrings[keyCode];
+        }
+        else return hasVisibleString ? str : keyStrings[keyCode];
     }
 
     private dstring str;

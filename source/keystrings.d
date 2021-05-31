@@ -169,6 +169,7 @@ public immutable dstring[] keyStrings =
         "RCTRL", // 0xA3 Right Ctrl
         "LMENU", // 0xA4 Left Menu
         "RMENU", // 0xA5 Right Menu
+        "", // 0xA6 ???????????
         "", // 0xA7 Browser Back
         "", // 0xA8 Browser Refresh
         "", // 0xA9 Browser Stop
@@ -176,8 +177,8 @@ public immutable dstring[] keyStrings =
         "", // 0xAB Browser Favourites
         "", // 0xAC Browser Start and Home
         "♫x", // 0xAD Volume Mute
-        "♫↑", // 0xAE Volume Up
-        "♫↓", // 0xAF Volume Down
+        "♫↓", // 0xAE Volume Down
+        "♫↑", // 0xAF Volume Up
         "►►", // 0xB0 Next Track
         "◄◄", // 0xB1 Previous Track
         "■", // 0xB2 Media Stop
