@@ -278,7 +278,6 @@ extern(C) int UIAppMain()
             {
                 if(event.lbutton.isDown)
                 {
-                    window.showMessageBox("KEK"d, to!dstring(event.lbutton.doubleClick));
                     vl.addChild(textEdit);
                     return true;
                 }
