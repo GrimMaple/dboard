@@ -174,16 +174,15 @@ extern(C) int UIAppMain()
             foreach(i, ref disp; keysDisp)
             {
                 if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
-                withinGridRange(event.x, disp.locx, disp.locx + disp.w))
+                    withinGridRange(event.x, disp.locx, disp.locx + disp.w))
                 {
-                        //window.showMessageBox("KEK"d, to!dstring(event.lbutton.doubleClick));
-                        vl.addChild(textEdit);
-                        textEdit.text = disp.visibleString();
-                        textEdit.visibility = Visibility.Visible;
-                        changingName = true;
-                        nameEditing = &disp;
-                        textEdit.setFocus();
-                        return true;
+                    vl.addChild(textEdit);
+                    textEdit.text = disp.visibleString();
+                    textEdit.visibility = Visibility.Visible;
+                    changingName = true;
+                    nameEditing = &disp;
+                    textEdit.setFocus();
+                    return true;
                 }
             }
         }
@@ -193,6 +192,8 @@ extern(C) int UIAppMain()
             if(dragRight)
             {
                 drag.w = threeWayRound(getGridLoc(event.x) - drag.locx);
+                if(drag.w < 0.5 )
+                    drag.w = 0.5;
                 canvas.invalidate();
                 window.invalidate();
                 return true;
@@ -201,21 +202,29 @@ extern(C) int UIAppMain()
             {
                 immutable save = drag.locx;
                 immutable locxx = drag.locx + drag.w;
-                drag.locx = threeWayRound(getGridLoc(event.x));
-                drag.w = locxx - drag.locx; // Increase the width of the visible item
+                if(locxx - threeWayRound(getGridLoc(event.x)) >= 0.5)
+                {
+                    drag.locx = threeWayRound(getGridLoc(event.x));
+                    drag.w = locxx - drag.locx; // Increase the width of the visible item
+                }
                 return true;
             }
             else if(dragTop)
             {
                 immutable save = drag.locy;
                 immutable locyy = drag.locy + drag.h;
-                drag.locy = threeWayRound(getGridLoc(event.y));
-                drag.h = locyy - drag.locy; // Increase the width of visible item
+                if(locyy - threeWayRound(getGridLoc(event.y)) >= 0.5)
+                {
+                    drag.locy = threeWayRound(getGridLoc(event.y));
+                    drag.h = locyy - drag.locy; // Increase the width of visible item
+                }
                 return true;
             }
             else if(dragBottom)
             {
                 drag.h = threeWayRound(getGridLoc(event.y) - drag.locy);
+                if(drag.h < 0.5 )
+                    drag.h = 0.5;
                 canvas.invalidate();
                 window.invalidate();
                 return true;
