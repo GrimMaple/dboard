@@ -16,10 +16,7 @@ import io;
 
 mixin APP_ENTRY_POINT;
 
-int code = 0;
-KeyState gstate = KeyState.Up;
-
-bool[] keysStates = new bool[256];
+__gshared bool[int] keysStates;
 
 bool isWhole(float f)
 {
@@ -46,7 +43,7 @@ bool changingName = false;
 
 KeyDisplay* nameEditing = null;
 
-KeyDisplay n;
+__gshared KeyDisplay n;
 
 bool hasOffset = false;
 int xoffs = 0, yoffs = 0;
@@ -117,7 +114,6 @@ extern(C) int UIAppMain()
     immutable str = "QWERTYUIOP";
     Window window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
     window.show();
-    keysStates[] = false;
 
     VerticalLayout vl = new VerticalLayout();
     vl.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
@@ -357,7 +353,7 @@ extern(C) int UIAppMain()
         {
             import std.math : ceil;
             immutable  idx = keysDisp[i].keyCode;
-            immutable color = keysStates[idx] ? 0xCCCCCC : 0x777777;
+            immutable color = keysStates.get(idx, false) ? 0xCCCCCC : 0x777777;
             drawDisp(keysDisp[i], color);
         }
 
@@ -372,25 +368,28 @@ extern(C) int UIAppMain()
 
     window.mainWidget = vl;
 
-    KeyHook.get().OnAction = (int vkCode, KeyState state)
+    KeyHook.get(window).addCallback((IKeyHook hook, int vkCode, KeyState state)
     {
+        const keyEscape = hook.getSpecialKey(SpecialKey.Escape);
+
         if(addMode && state == KeyState.Down)
         {
-            if(n.keyCode == 0x1B && vkCode == 0x1B) // ESCAPE
+            if(n.keyCode == keyEscape && vkCode == keyEscape)
             {
                 addMode = false;
             }
             else
             {
                 n.keyCode = vkCode;
+                n.visibleString = hook.getKeyName(vkCode);
             }
         }
-        code = vkCode;
-        keysStates[code] = (state == KeyState.Down) ? true : false;
-        gstate = state;
+        keysStates[vkCode] = (state == KeyState.Down) ? true : false;
         canvas.invalidate();
         window.invalidate();
-    };
+    });
+    scope (exit)
+        KeyHook.finish();
     immutable res = Platform.instance.enterMessageLoop();
     storePreferences();
     return res;
