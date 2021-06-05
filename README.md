@@ -39,8 +39,6 @@ DBoard saves keyboard files as plain json text. It can be edited afterwards to y
 Example json:
 ```json
 {
-    "keyOffset": 3,
-    "keySize": 48,
     "keys": [
         {
             "h": 1, // Key height in logical palces

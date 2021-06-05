@@ -7,8 +7,6 @@ import ui;
 
 immutable testJson = 
 `{
-    "keySize": 48,
-    "keyOffset": 3,
     "keys": [
         {
             "locx": 1,
@@ -41,6 +39,8 @@ immutable testJson =
     ]
 }`;
 
+
+/// Serialize `KeyDisplay[]` to json string
 string saveJson(ref KeyDisplay[] keysDisp)
 {
     JSONValue toValue(ref KeyDisplay disp)
@@ -56,8 +56,6 @@ string saveJson(ref KeyDisplay[] keysDisp)
         return val;
     }
     JSONValue res;
-    res["keySize"] = keySize;
-    res["keyOffset"] = keyOffset;
     JSONValue[] vals = new JSONValue[0];
     foreach (ref key; keysDisp)
     {
@@ -67,12 +65,11 @@ string saveJson(ref KeyDisplay[] keysDisp)
     return toJSON(res, true);
 }
 
+/// Deserialize `string` to `KeyDisplay[]`
 KeyDisplay[] loadJsonFile(in string json)
 {
     KeyDisplay[] keysDisp = new KeyDisplay[0];
     auto parsed = parseJSON(json);
-    keySize = parsed["keySize"].get!int();
-    keyOffset = parsed["keyOffset"].get!int();
     auto keys = parsed["keys"].get!(JSONValue[])();
     foreach(val; keys)
     {

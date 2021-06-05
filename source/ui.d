@@ -13,8 +13,26 @@ import keys;
 __gshared bool editMode = false;
 __gshared bool addMode = false;
 
-__gshared int keySize = 48;
-__gshared int keyOffset = 3;
+// This is sort-of a hack to shorthand the usage of Preferenses
+int keyOffset()
+{
+    return prefs.keyOffset;
+}
+
+void keyOffset(int a)
+{
+    prefs.keyOffset = a;
+}
+
+int keySize()
+{
+    return prefs.keySize;
+}
+
+void keySize(int a)
+{
+    prefs.keySize = a;
+}
 
 __gshared KeyDisplay[] keysDisp = new KeyDisplay[0];
 
@@ -22,6 +40,8 @@ struct Preferences
 {
     @ConfigProperty() string lastJson;
     @ConfigProperty() string keyColor = "00FF00";
+    @ConfigProperty() int keySize = 48;
+    @ConfigProperty() int keyOffset = 3;
 }
 
 __gshared Preferences prefs;
