@@ -5,9 +5,22 @@
     "copyright": "Copyright © 2021, Grim Maple",
     "dependencies": {
         "dlangui": "~>0.9.186",
-        "mud": "~>0.1.0"
+        "mud": "~>0.1.0",
+        "win32": "~>2.97.0",
+        "x11": "~>1.0.21"
     },
+    "targetType": "executable",
     "description": "Keyboard Input Visualization Program",
     "license": "MIT",
-    "name": "dboard"
+    "name": "dboard",
+    "configurations": [
+        {
+            "name": "application"
+        },
+        {
+            "name": "x11",
+            "libs": ["Xi"],
+            "versions": ["EnableX11"]
+        }
+    ]
 }

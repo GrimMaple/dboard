@@ -1,6 +1,8 @@
 module keyboard;
 
-import core.sys.windows.windows;
+import platformconfig;
+
+import dlangui : Window;
 
 enum KeyState
 {
@@ -8,65 +10,69 @@ enum KeyState
     Down
 }
 
+enum SpecialKey
+{
+    Escape
+}
+
+alias KeyCallback = void delegate(IKeyHook hook, int keysym, KeyState state);
+interface IKeyHook
+{
+    int getSpecialKey(SpecialKey key);
+    dstring getKeyName(int keysym);
+    void addCallback(KeyCallback callback);
+    void finish();
+}
+
 class KeyHook
 {
-    private this()
-    {
-        hHook = SetHook();
-        assert(hHook !is null);
-    }
-
     private static bool instantiated;
 
-    private __gshared KeyHook instance;
+    private __gshared IKeyHook instance;
 
-    private HHOOK hHook;
-
-    @property static auto get()
+    @property static IKeyHook get(Window window)
     {
         synchronized
         {
-            if(!instantiated)
+            if (!instantiated)
             {
-                instance = new KeyHook();
+                instance = makePlatformHook(window);
             }
             instantiated = true;
         }
         return instance;
     }
 
-    void delegate(int keycode, KeyState state) OnAction;
-
-    private auto SetHook()
+    static void finish()
     {
-        return SetWindowsHookEx(WH_KEYBOARD_LL, &HookCallback, GetModuleHandle(NULL), 0);
+        synchronized
+        {
+            if (instantiated)
+                instance.finish();
+        }
     }
 
-    private static extern(Windows) long HookCallback(int nCode, WPARAM wParam, LPARAM lParam) @system nothrow
+    private static IKeyHook makePlatformHook(Window window)
     {
-        if(nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN || wParam == WM_KEYUP || wParam == WM_SYSKEYUP))
+        // window parameter in case we need a window handle in implementations
+
+        static if (EnableWin32Hook)
         {
-            KBDLLHOOKSTRUCT* kb = cast(KBDLLHOOKSTRUCT*)lParam;
-            int vkCode = kb.vkCode;
-            try
-            {
-                if(KeyHook.get().OnAction !is null)
-                    KeyHook.get().OnAction(vkCode, (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? KeyState.Down : KeyState.Up);
-            }
-            catch(Exception ex)
-            {
-                // ...
-            }
+            import impl.win32;
+
+            // on windows there is only one
+            if (auto hook = Win32KeyHook.get())
+                return hook;
         }
-        HHOOK hook = null;
-        try
+
+        static if (EnableX11Hook)
         {
-            hook = KeyHook.get().hHook;
+            import impl.x11;
+
+            if (auto hook = X11KeyHook.create())
+                return hook;
         }
-        catch(Exception ex)
-        {
-            // ...
-        }
-        return CallNextHookEx(hook, nCode, wParam, lParam);
+
+        assert(false, "No keyboard hook could be created for this system");
     }
 }
