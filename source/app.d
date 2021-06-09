@@ -1,6 +1,7 @@
 import std.stdio;
 import std.json;
 import std.conv : to;
+import std.functional : toDelegate;
 
 import dlangui;
 import dlangui.dialogs.dialog;
@@ -13,6 +14,7 @@ import keystrings;
 import ui;
 import keys;
 import io;
+import util;
 
 mixin APP_ENTRY_POINT;
 
@@ -21,13 +23,6 @@ KeyState gstate = KeyState.Up;
 
 bool[] keysStates = new bool[256];
 
-bool isWhole(float f)
-{
-    if(f - cast(int)f != 0)
-        return false;
-    return true;
-}
-
 KeyDisplay temporary;
 
 enum KeyEnd
@@ -35,6 +30,8 @@ enum KeyEnd
     Left,
     Right
 }
+
+Window window = null;
 
 bool dragLeft = false;
 bool dragRight = false;
@@ -74,18 +71,6 @@ bool withinGridRange(int coord, float a, float b)
        coord <= getLocOnGrid!(KeyEnd.Right)(max(a, b)))
         return true;
     return false;
-}
-
-float threeWayRound(float input)
-{
-    float x = input - cast(int)input;
-    if(x < 0.2)
-        return input - x;
-    if(x < 0.6 && x > 0.4)
-        return input - x + 0.5;
-    if(x > 0.8)
-        return input - x + 1;
-    return input;
 }
 
 void loadPreferences()
@@ -164,11 +149,68 @@ bool enableTextEditing(in Point loc, VerticalLayout vl)
     return false;
 }
 
+private void drawGrid(DrawBuf buf)
+{
+    int x = keyOffset;
+    while(x < window.width)
+    {
+        buf.drawLine(Point(x, 0), Point(x, window.height), 0x0);
+        x += keyOffset + keySize;
+    }
+    int y = keyOffset;
+    while(y <= window.height)
+    {
+        buf.drawLine(Point(0, y), Point(window.width, y), 0);
+        y += keyOffset + keySize;
+    }
+}
+
+private void drawDisp(DrawBuf buf, CanvasWidget c, ref KeyDisplay disp, uint color)
+{
+    auto s = disp.visibleString;
+    auto sz = c.font.textSize(s);
+    immutable x = getLocOnGrid!(KeyEnd.Left)(disp.locx);
+    immutable y = getLocOnGrid!(KeyEnd.Left)(disp.locy);
+    immutable pxWidth = getLocOnGrid!(KeyEnd.Right)(disp.locx + disp.w) - getLocOnGrid!(KeyEnd.Left)(disp.locx);
+    immutable pxHeight = getLocOnGrid!(KeyEnd.Right)(disp.locy + disp.h) - getLocOnGrid!(KeyEnd.Left)(disp.locy);
+    buf.fillRect(Rect(x, y, x + pxWidth, y + pxHeight), color);
+    c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, 0x0);
+}
+
+private void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
+{
+    import std.conv : to;
+    buf.fill(to!uint(prefs.keyColor, 16));
+
+    c.fontFace = "Arial";
+
+    // Draw grid in edit mode
+    if(editMode)
+    {
+        drawGrid(buf);
+    }
+    foreach(i, ref keyDisp; keysDisp)
+    {
+        immutable color = keysStates[i] ? 0xCCCCCC : 0x777777;
+        drawDisp(buf, c, keyDisp, color);
+    }
+
+    if(addMode)
+    {
+        drawDisp(buf, c, n, 0x99999999);
+    }
+
+    if(changingHotkey)
+    {
+        drawDisp(buf, c, *nameEditing, 0x00AAFF);
+    }
+}
+
 extern(C) int UIAppMain()
 {
     loadPreferences();
     immutable str = "QWERTYUIOP";
-    Window window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
+    window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
     window.show();
     keysStates[] = false;
 
@@ -359,59 +401,7 @@ extern(C) int UIAppMain()
     };
 
     canvas.layoutWidth(FILL_PARENT).layoutHeight(400);
-    canvas.onDrawListener = delegate(CanvasWidget c, DrawBuf buf, Rect rc)
-    {
-        import std.conv : to;
-        buf.fill(to!uint(prefs.keyColor, 16));
-
-        c.fontFace = "Arial";// = FontManager.instance.getFont(24, 300, false, FontFamily.Serif, "Arial");
-        void drawDisp(ref KeyDisplay disp, uint color)
-        {
-            auto s = disp.visibleString;
-            auto sz = c.font.textSize(s);
-            immutable x = getLocOnGrid!(KeyEnd.Left)(disp.locx);
-            immutable y = getLocOnGrid!(KeyEnd.Left)(disp.locy);
-            immutable pxWidth = getLocOnGrid!(KeyEnd.Right)(disp.locx + disp.w) - getLocOnGrid!(KeyEnd.Left)(disp.locx);
-            immutable pxHeight = getLocOnGrid!(KeyEnd.Right)(disp.locy + disp.h) - getLocOnGrid!(KeyEnd.Left)(disp.locy);
-            buf.fillRect(Rect(x, y, x + pxWidth, y + pxHeight), color);
-            c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, 0x0);
-        }
-
-        // Draw grid in edit mode
-        if(editMode)
-        {
-            int x = keyOffset;
-            while(x < window.width)
-            {
-                buf.drawLine(Point(x, 0), Point(x, window.height), 0x0);
-                x += keyOffset + keySize;
-            }
-            int y = keyOffset;
-            while(y <= window.height)
-            {
-                buf.drawLine(Point(0, y), Point(window.width, y), 0);
-                y += keyOffset + keySize;
-            }
-        }
-
-        for(int i=0; i<keysDisp.length; i++)
-        {
-            import std.math : ceil;
-            immutable  idx = keysDisp[i].keyCode;
-            immutable color = keysStates[idx] ? 0xCCCCCC : 0x777777;
-            drawDisp(keysDisp[i], color);
-        }
-
-        if(addMode)
-        {
-            drawDisp(n, 0x99999999);
-        }
-
-        if(changingHotkey)
-        {
-            drawDisp(*nameEditing, 0x00AAFF);
-        }
-    };
+    canvas.onDrawListener = toDelegate(&onDraw);
 
     vl.addChild(canvas);
 

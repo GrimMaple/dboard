@@ -2,22 +2,36 @@ module keys;
 
 import keystrings;
 
+/// Key display information
 struct KeyDisplay
 {
-    float locx = 0, locy = 0;
-    int keyCode = 0;
-    float w = 1, h = 1;
+    /// Key display logical X position
+    float locx = 0;
 
+    /// Key display logical Y position
+    float locy = 0;
+    
+    /// VK code for this key display
+    int keyCode = 0;
+
+    /// Key display logical width
+    float w = 1;
+    
+    /// Key display logical height
+    float h = 1;
+
+    /// Does this `KeyDisplay` have a custom display string
     @property bool hasVisibleString()
     {
         return str != "";
     }
 
+    /// String that should be drawn for this key
     @property void visibleString(dstring str)
     {
         this.str = str;
     }
-
+    ///
     @property dstring visibleString()
     {
         debug
