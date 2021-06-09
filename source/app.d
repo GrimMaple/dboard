@@ -44,6 +44,8 @@ KeyDisplay* drag = null;
 
 bool changingName = false;
 
+bool changingHotkey = false;
+
 KeyDisplay* nameEditing = null;
 
 KeyDisplay n;
@@ -111,6 +113,57 @@ void resetDragProperties()
     dragBottom = false;
 }
 
+void cancelEditing(VerticalLayout vl)
+{
+    if(changingName && nameEditing)
+    {
+        changingName = false;
+        nameEditing.visibleString = vl.childById!EditLine("editText").text;
+        nameEditing = null;
+        vl.removeChild("editText");
+        vl.invalidate();
+    }
+}
+
+KeyDisplay* selectDispAtPosition(in Point loc)
+{
+    foreach(i, ref disp; keysDisp)
+    {
+        if(withinGridRange(loc.y, disp.locy, disp.locy + disp.h) &&
+            withinGridRange(loc.x, disp.locx, disp.locx + disp.w))
+        {
+            return &disp;
+        }
+    }
+    return null;
+}
+
+bool enableTextEditing(in Point loc, VerticalLayout vl)
+{
+    EditLine textEdit = new EditLine("editText");
+    textEdit.layoutHeight(30).layoutWidth(FILL_PARENT);
+    textEdit.visibility = Visibility.Invisible;
+
+    textEdit.enterKey = delegate(EditWidgetBase w)
+    {
+        cancelEditing(vl);
+        return true;
+    };
+
+
+    nameEditing = selectDispAtPosition(loc);
+    if(nameEditing !is null)
+    {
+        vl.addChild(textEdit);
+        textEdit.text = nameEditing.visibleString();
+        textEdit.visibility = Visibility.Visible;
+        changingName = true;
+        textEdit.setFocus();
+        return true;
+    }
+    return false;
+}
+
 extern(C) int UIAppMain()
 {
     loadPreferences();
@@ -123,27 +176,6 @@ extern(C) int UIAppMain()
     vl.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
 
     CanvasWidget canvas = new CanvasWidget("canvas");
-
-    EditLine textEdit = new EditLine("editText");
-    textEdit.layoutHeight(30).layoutWidth(FILL_PARENT);
-    textEdit.visibility = Visibility.Invisible;
-
-    void cancelEditing()
-    {
-        if(nameEditing)
-        {
-            changingName = false;
-            vl.removeChild("editText");
-            nameEditing.visibleString = textEdit.text;
-            window.invalidate();
-        }
-    }
-
-    textEdit.enterKey = delegate(EditWidgetBase w)
-    {
-        cancelEditing();
-        return true;
-    };
 
     canvas.popupMenu = constructMainMenu(window, canvas);
 
@@ -169,26 +201,28 @@ extern(C) int UIAppMain()
             window.invalidate();
             return true;
         }
-        if(event.lbutton.doubleClick && !changingName)
+        if(event.rbutton.isDown && changingHotkey)
         {
-            foreach(i, ref disp; keysDisp)
+            return true;
+        }
+        if(event.lbutton.doubleClick && !changingName && !changingHotkey)
+        {
+            nameEditing = selectDispAtPosition(Point(event.x, event.y));
+            if(nameEditing !is null)
             {
-                if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
-                    withinGridRange(event.x, disp.locx, disp.locx + disp.w))
-                {
-                    vl.addChild(textEdit);
-                    textEdit.text = disp.visibleString();
-                    textEdit.visibility = Visibility.Visible;
-                    changingName = true;
-                    nameEditing = &disp;
-                    textEdit.setFocus();
-                    return true;
-                }
+                changingHotkey = true;
             }
+            return true;
         }
         if(event.lbutton.isDown)
         {
-            cancelEditing();
+            if(changingHotkey)
+            {
+                changingHotkey = false;
+                nameEditing = null;
+                return true;
+            }
+            cancelEditing(vl);
             if(dragRight)
             {
                 drag.w = threeWayRound(getGridLoc(event.x) - drag.locx);
@@ -285,11 +319,7 @@ extern(C) int UIAppMain()
             if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
                withinGridRange(event.x, disp.locx, disp.locx + disp.w))
             {
-                if(event.lbutton.isDown)
-                {
-                    vl.addChild(textEdit);
-                    return true;
-                }
+
                 MenuItem itm = new MenuItem();
                 MenuItem del = new MenuItem(new Action(0, "Delete"d));
                 del.menuItemClick = delegate(MenuItem item)
@@ -298,7 +328,18 @@ extern(C) int UIAppMain()
                     canvas.popupMenu = constructMainMenu(window, canvas);
                     return true;
                 };
+
+                MenuItem txt = new MenuItem(new Action(1, "Change text"d));
+                txt.menuItemClick = delegate(MenuItem item)
+                {
+                    immutable pt = Point(event.x, event.y);
+                    enableTextEditing(pt, vl);
+                    return true;
+                };
+
                 itm.add(del);
+                itm.add(txt);
+
                 canvas.popupMenu = itm;
                 resetDragProperties();
                 drag = &disp;
@@ -365,15 +406,25 @@ extern(C) int UIAppMain()
         {
             drawDisp(n, 0x99999999);
         }
+
+        if(changingHotkey)
+        {
+            drawDisp(*nameEditing, 0x00AAFF);
+        }
     };
 
     vl.addChild(canvas);
-    //vl.addChild(textEdit);
 
     window.mainWidget = vl;
 
     KeyHook.get().OnAction = (int vkCode, KeyState state)
     {
+        if(changingHotkey)
+        {
+            nameEditing.keyCode = vkCode;
+            nameEditing = null;
+            changingHotkey = false;
+        }
         if(addMode && state == KeyState.Down)
         {
             if(n.keyCode == 0x1B && vkCode == 0x1B) // ESCAPE

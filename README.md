@@ -23,10 +23,10 @@ To add a new key:
 * Place the key on the grid and left click
 
 To delete a key, right click the key and press "Delete".  
-Drag the edges of any key to change its size.  
+To change the key string representation, right click and select "Change text".  
 Double click any key to change the display string of the key.  
-  
-It is currently *not possible* to change the key mapping. If you want to change key mapping, you have to delete and re-add a key.  
+Drag the edges of any key to change its size.  
+Double click to change the key mapping.  
 
 ### Global settings
 Global settings allow for changing the following appearance aspects:
