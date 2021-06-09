@@ -10,10 +10,32 @@ enum KeyState
 
 class KeyHook
 {
-    private this()
+    private this() nothrow
     {
         hHook = SetHook();
         assert(hHook !is null);
+        initConversionTable();
+        initNonExtensionConversion();
+    }
+
+    private void initConversionTable() nothrow
+    {
+        extendedConversion[VK_RETURN] = 0x3B; // Hacks :(
+    }
+
+    private void initNonExtensionConversion() nothrow
+    {
+        nonExtendedConversion[VK_INSERT] = VK_NUMPAD0;
+        nonExtendedConversion[VK_END] = VK_NUMPAD1;
+        nonExtendedConversion[VK_HOME] = VK_NUMPAD7;
+        nonExtendedConversion[VK_PRIOR] = VK_NUMPAD9;
+        nonExtendedConversion[VK_NEXT] = VK_NUMPAD3;
+        nonExtendedConversion[VK_DELETE] = VK_DECIMAL;
+        nonExtendedConversion[VK_LEFT] = VK_NUMPAD4;
+        nonExtendedConversion[VK_RIGHT] = VK_NUMPAD6;
+        nonExtendedConversion[VK_UP] = VK_NUMPAD8;
+        nonExtendedConversion[VK_DOWN] = VK_NUMPAD2;
+        nonExtendedConversion[VK_CLEAR] = VK_NUMPAD5;
     }
 
     private static bool instantiated;
@@ -22,7 +44,7 @@ class KeyHook
 
     private HHOOK hHook;
 
-    @property static auto get()
+    @property static auto get() nothrow
     {
         synchronized
         {
@@ -48,6 +70,16 @@ class KeyHook
         {
             KBDLLHOOKSTRUCT* kb = cast(KBDLLHOOKSTRUCT*)lParam;
             int vkCode = kb.vkCode;
+            if(kb.flags & LLKHF_EXTENDED)
+            {
+                if(vkCode in KeyHook.get().extendedConversion)
+                    vkCode = KeyHook.get().extendedConversion[vkCode];
+            }
+            else
+            {
+                if(vkCode in KeyHook.get().nonExtendedConversion)
+                    vkCode = KeyHook.get().nonExtendedConversion[vkCode];
+            }
             try
             {
                 if(KeyHook.get().OnAction !is null)
@@ -69,4 +101,7 @@ class KeyHook
         }
         return CallNextHookEx(hook, nCode, wParam, lParam);
     }
+
+    private DWORD[DWORD] nonExtendedConversion;
+    private DWORD[DWORD] extendedConversion;
 }

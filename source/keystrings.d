@@ -62,7 +62,7 @@ public immutable dstring[] keyStrings =
         "8", // 0x38 8
         "9", // 0x39 9
         "", // 0x3A-0x40 Undefined
-        "", // 0x3B
+        "ENT", // 0x3B
         "", // 0x3C
         "", // 0x3D
         "", // 0x3E

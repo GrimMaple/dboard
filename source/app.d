@@ -191,7 +191,7 @@ private void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
     }
     foreach(i, ref keyDisp; keysDisp)
     {
-        immutable color = keysStates[i] ? 0xCCCCCC : 0x777777;
+        immutable color = keysStates[keyDisp.keyCode] ? 0xCCCCCC : 0x777777;
         drawDisp(buf, c, keyDisp, color);
     }
 

@@ -1,0 +1,725 @@
+{
+    "keys": [
+        {
+            "h": 1,
+            "keyCode": 27,
+            "locx": 0,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 112,
+            "locx": 2,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 113,
+            "locx": 3,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 114,
+            "locx": 4,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 115,
+            "locx": 5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 116,
+            "locx": 6.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 117,
+            "locx": 7.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 118,
+            "locx": 8.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 119,
+            "locx": 9.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 120,
+            "locx": 11,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 121,
+            "locx": 12,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 122,
+            "locx": 13,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 123,
+            "locx": 14,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 192,
+            "locx": 0,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 49,
+            "locx": 1,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 50,
+            "locx": 2,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 51,
+            "locx": 3,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 52,
+            "locx": 4,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 53,
+            "locx": 5,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 54,
+            "locx": 6,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 55,
+            "locx": 7,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 56,
+            "locx": 8,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 57,
+            "locx": 9,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 48,
+            "locx": 10,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 189,
+            "locx": 11,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 187,
+            "locx": 12,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 8,
+            "locx": 13,
+            "locy": 2,
+            "w": 2
+        },
+        {
+            "h": 1,
+            "keyCode": 9,
+            "locx": 0,
+            "locy": 3,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 81,
+            "locx": 1.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 87,
+            "locx": 2.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 69,
+            "locx": 3.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 82,
+            "locx": 4.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 84,
+            "locx": 5.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 89,
+            "locx": 6.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 85,
+            "locx": 7.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 73,
+            "locx": 8.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 79,
+            "locx": 9.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 80,
+            "locx": 10.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 219,
+            "locx": 11.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 221,
+            "locx": 12.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 220,
+            "locx": 13.5,
+            "locy": 3,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 20,
+            "locx": 0,
+            "locy": 4,
+            "w": 2
+        },
+        {
+            "h": 1,
+            "keyCode": 65,
+            "locx": 2,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 83,
+            "locx": 3,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 68,
+            "locx": 4,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 70,
+            "locx": 5,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 71,
+            "locx": 6,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 72,
+            "locx": 7,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 74,
+            "locx": 8,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 75,
+            "locx": 9,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 76,
+            "locx": 10,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 186,
+            "locx": 11,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 222,
+            "locx": 12,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 13,
+            "locx": 13,
+            "locy": 4,
+            "w": 2
+        },
+        {
+            "h": 1,
+            "keyCode": 160,
+            "locx": 0,
+            "locy": 5,
+            "w": 2.5
+        },
+        {
+            "h": 1,
+            "keyCode": 90,
+            "locx": 2.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 88,
+            "locx": 3.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 67,
+            "locx": 4.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 86,
+            "locx": 5.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 66,
+            "locx": 6.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 78,
+            "locx": 7.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 77,
+            "locx": 8.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 188,
+            "locx": 9.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 190,
+            "locx": 10.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 191,
+            "locx": 11.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 161,
+            "locx": 12.5,
+            "locy": 5,
+            "w": 2.5
+        },
+        {
+            "h": 1,
+            "keyCode": 162,
+            "locx": 0,
+            "locy": 6,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 91,
+            "locx": 1.5,
+            "locy": 6,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 164,
+            "locx": 3,
+            "locy": 6,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 32,
+            "locx": 4.5,
+            "locy": 6,
+            "w": 5.5
+        },
+        {
+            "h": 1,
+            "keyCode": 165,
+            "locx": 10,
+            "locy": 6,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 93,
+            "locx": 11.5,
+            "locy": 6,
+            "w": 2
+        },
+        {
+            "h": 1,
+            "keyCode": 163,
+            "locx": 13.5,
+            "locy": 6,
+            "w": 1.5
+        },
+        {
+            "h": 1,
+            "keyCode": 44,
+            "locx": 15.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 145,
+            "locx": 16.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 19,
+            "locx": 17.5,
+            "locy": 0.5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 45,
+            "locx": 15.5,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 36,
+            "locx": 16.5,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 33,
+            "locx": 17.5,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 46,
+            "locx": 15.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 35,
+            "locx": 16.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 34,
+            "locx": 17.5,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 37,
+            "locx": 15.5,
+            "locy": 6,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 40,
+            "locx": 16.5,
+            "locy": 6,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 39,
+            "locx": 17.5,
+            "locy": 6,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 38,
+            "locx": 16.5,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 144,
+            "locx": 19,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 111,
+            "locx": 20,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 106,
+            "locx": 21,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 109,
+            "locx": 22,
+            "locy": 2,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 103,
+            "locx": 19,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 104,
+            "locx": 20,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 105,
+            "locx": 21,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 2,
+            "keyCode": 107,
+            "locx": 22,
+            "locy": 3,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 100,
+            "locx": 19,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 101,
+            "locx": 20,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 102,
+            "locx": 21,
+            "locy": 4,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 97,
+            "locx": 19,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 98,
+            "locx": 20,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 99,
+            "locx": 21,
+            "locy": 5,
+            "w": 1
+        },
+        {
+            "h": 1,
+            "keyCode": 96,
+            "locx": 19,
+            "locy": 6,
+            "w": 2
+        },
+        {
+            "h": 1,
+            "keyCode": 110,
+            "locx": 21,
+            "locy": 6,
+            "w": 1
+        },
+        {
+            "h": 2,
+            "keyCode": 59,
+            "locx": 22,
+            "locy": 5,
+            "w": 1
+        }
+    ]
+}
