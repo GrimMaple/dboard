@@ -90,15 +90,7 @@ class KeyHook
                 // ...
             }
         }
-        HHOOK hook = null;
-        try
-        {
-            hook = KeyHook.get().hHook;
-        }
-        catch(Exception ex)
-        {
-            // ...
-        }
+        HHOOK hook = KeyHook.get().hHook;
         return CallNextHookEx(hook, nCode, wParam, lParam);
     }
 

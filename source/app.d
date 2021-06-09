@@ -83,6 +83,19 @@ void loadPreferences()
         keysDisp = loadJsonFile(readText(prefs.lastJson));
 }
 
+void figureOutWindowSize()
+{
+    import std.algorithm : max;
+    float maxx = 0, maxy = 0;
+    foreach(keyDisp; keysDisp)
+    {
+        maxx = max(maxx, keyDisp.locx);
+        maxy = max(maxy, keyDisp.locy);
+    }
+
+    window.resizeWindow(Point(getLocOnGrid!(KeyEnd.Right)(maxx + keyOffset), getLocOnGrid!(KeyEnd.Right)(maxy + keyOffset)));
+}
+
 void storePreferences()
 {
     serializeConfig(prefs, "prefs");
@@ -180,6 +193,7 @@ private void drawDisp(DrawBuf buf, CanvasWidget c, ref KeyDisplay disp, uint col
 private void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
 {
     import std.conv : to;
+    buf.resize(window.width, window.height);
     buf.fill(to!uint(prefs.keyColor, 16));
 
     c.fontFace = "Arial";
@@ -210,8 +224,9 @@ extern(C) int UIAppMain()
 {
     loadPreferences();
     immutable str = "QWERTYUIOP";
-    window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 200);
+    window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 100);
     window.show();
+    figureOutWindowSize();
     keysStates[] = false;
 
     VerticalLayout vl = new VerticalLayout();

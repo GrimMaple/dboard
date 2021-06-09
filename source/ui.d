@@ -10,6 +10,8 @@ import io;
 import keystrings;
 import keys;
 
+import app;
+
 __gshared bool editMode = false;
 __gshared bool addMode = false;
 
@@ -85,9 +87,10 @@ MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
             string filename = dlg.filename;
             string json = readText(filename);
             prefs.lastJson = filename;
-            loadJsonFile(json);
+            keysDisp = loadJsonFile(json);
             c.invalidate();
             w.invalidate();
+            figureOutWindowSize();
         };
         dlg.show();
         return true;
