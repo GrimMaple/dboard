@@ -45,6 +45,9 @@ bool changingHotkey = false;
 
 KeyDisplay* nameEditing = null;
 
+immutable minWidth = 400;
+immutable minHeight = 400;
+
 KeyDisplay n;
 
 bool hasOffset = false;
@@ -80,10 +83,13 @@ void loadPreferences()
         deserializeConfig(prefs, "prefs");
 
     if(prefs.lastJson != "")
-        keysDisp = loadJsonFile(readText(prefs.lastJson));
+    {
+        if(exists(prefs.lastJson))
+            keysDisp = loadJsonFile(readText(prefs.lastJson));
+    }
 }
 
-void figureOutWindowSize()
+auto figureOutWindowSize()
 {
     import std.algorithm : max;
     float maxx = 0, maxy = 0;
@@ -93,7 +99,12 @@ void figureOutWindowSize()
         maxy = max(maxy, keyDisp.locy);
     }
 
-    window.resizeWindow(Point(getLocOnGrid!(KeyEnd.Right)(maxx + keyOffset), getLocOnGrid!(KeyEnd.Right)(maxy + keyOffset)));
+    immutable width = max(getLocOnGrid!(KeyEnd.Right)(maxx + keyOffset)+ keyOffset, minWidth);
+    immutable height = max(getLocOnGrid!(KeyEnd.Right)(maxy + keyOffset) + keyOffset, minHeight);
+
+    // I don't know why dlnagui does this to me, but it sizes the window by 92 more pixels than requested
+    window.resizeWindow(Point(width-92, height-92));
+    return Point(width, height);
 }
 
 void storePreferences()
@@ -223,16 +234,15 @@ private void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
 extern(C) int UIAppMain()
 {
     loadPreferences();
-    immutable str = "QWERTYUIOP";
-    window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable, 400, 100);
+    window = Platform.instance.createWindow("DBoard", null, WindowFlag.Resizable);
     window.show();
-    figureOutWindowSize();
+    immutable sizes = figureOutWindowSize();
     keysStates[] = false;
 
     VerticalLayout vl = new VerticalLayout();
-    vl.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
-
+    vl.fillParent();
     CanvasWidget canvas = new CanvasWidget("canvas");
+    canvas.fillParent();
 
     canvas.popupMenu = constructMainMenu(window, canvas);
 
