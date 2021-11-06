@@ -35,7 +35,7 @@ jobs:
       - name: "Get deps"
         runs-on: ubuntu-latest
         run: |
-          sudo apt-get install libxi-dev
+          sudo apt-get install -y libxi-dev
 
       - name: 'Build'
         run: |
