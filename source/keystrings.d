@@ -1,7 +1,7 @@
 module keystrings;
 
 /// Immutable array of VK_CEYCODES -> String representations
-public immutable dstring[] keyStrings = 
+public immutable dstring[] keyStrings =
     [
         "", // 0x00
         "LB", // 0x01 Left Mouse Button
@@ -167,8 +167,8 @@ public immutable dstring[] keyStrings =
         "SHIFT", // 0xA1 Right Shift
         "LCTRL", // 0xA2 Left Ctrl
         "RCTRL", // 0xA3 Right Ctrl
-        "LMENU", // 0xA4 Left Menu
-        "RMENU", // 0xA5 Right Menu
+        "ALT", // 0xA4 Left Menu
+        "ALT", // 0xA5 Right Menu
         "", // 0xA6 ???????????
         "", // 0xA7 Browser Back
         "", // 0xA8 Browser Refresh

@@ -7,6 +7,10 @@
         "dlangui": "~>0.9.186",
         "mud": "~>0.1.0"
     },
+    "dependencies-linx": {
+        "x11": "~>1.0.21"
+    },
+    "libs-linux": ["Xi"],
     "description": "Keyboard Input Visualization Program",
     "license": "MIT",
     "name": "dboard"

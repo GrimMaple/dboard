@@ -44,5 +44,11 @@ extern(C) int UIAppMain()
     auto window = new MainWindow();
     immutable res = Platform.instance.enterMessageLoop();
     storePreferences();
+    version(linux)
+    {
+        // I will fix this later, maybe...
+        import keyboard;
+        KeyHook.get().exit();
+    }
     return res;
 }
