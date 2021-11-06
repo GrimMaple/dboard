@@ -16,10 +16,11 @@ jobs:
       matrix:
         os:
           - windows-latest
+          - ubuntu-latest
         dc:
           - ldc-latest
           - dmd-latest
-        
+
     runs-on: ${{matrix.os}}
 
     steps:
