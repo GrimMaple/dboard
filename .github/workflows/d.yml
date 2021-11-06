@@ -32,6 +32,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
+      - name: "Get deps"
+        runs-on: ubuntu-latest
+        run: |
+          sudo apt-get install libxi-dev
+
       - name: 'Build'
         run: |
           # Build the project, with its main file included, without unittests
