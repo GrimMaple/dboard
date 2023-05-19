@@ -254,8 +254,8 @@ private:
 
         load.menuItemClick = delegate(MenuItem item)
         {
-            FileDialog dlg = new FileDialog(UIString("Open file"d), w, null);
-            dlg.addFilter(FileFilterEntry(UIString("JSON Files (*.json)"d), "*.json"));
+            FileDialog dlg = new FileDialog(UIString.fromRaw("Open file"), w, null);
+            dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
                 import std.file : readText;
@@ -275,9 +275,9 @@ private:
 
         save.menuItemClick = delegate(MenuItem item)
         {
-            FileDialog dlg = new FileDialog(UIString("Save file"d), w, null, DialogFlag.Modal | DialogFlag.Resizable
+            FileDialog dlg = new FileDialog(UIString.fromRaw("Save file"), w, null, DialogFlag.Modal | DialogFlag.Resizable
                 | FileDialogFlag.ConfirmOverwrite | FileDialogFlag.Save);
-            dlg.addFilter(FileFilterEntry(UIString("JSON Files (*.json)"d), "*.json"));
+            dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.filename = "mykeyboard";
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
@@ -345,7 +345,7 @@ private:
             return true;
         };
         mainMenu.add(clear);
-        
+
         return mainMenu;
     }
 
@@ -528,7 +528,7 @@ private:
     bool withinGridRange(int coord, float a, float b)
     {
         import std.algorithm : min, max;
-        
+
         if(coord >= getLocOnGrid!(KeyEnd.Left)(min(a, b)) &&
         coord <= getLocOnGrid!(KeyEnd.Right)(max(a, b)))
             return true;
