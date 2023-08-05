@@ -92,15 +92,20 @@ auto constructSettingsWidget(ref Window w)
     {
         try
         {
+            int tmpSize, tmpOffset;
             try
             {
-                keySize = to!int(widthEdit.text);
-                keyOffset = to!int(spacingEdit.text);
+                tmpSize = to!int(widthEdit.text);
+                tmpOffset = to!int(spacingEdit.text);
             }
             catch(Exception ex)
             {
-                throw new Exception("Please enter number!");
+                throw new Exception("Please enter numbers for key size and offset!");
             }
+            if(tmpSize < 1) throw new Exception("Key size can't be less than 1");
+            if(tmpOffset < 0) throw new Exception("Key offset can't be negative");
+            keySize = tmpSize;
+            keyOffset = tmpOffset;
             auto pressClr = decodeHexColor(to!string("#" ~ pressedColor.text));
             auto deprClr = decodeHexColor(to!string("#" ~ depressedColor.text));
             auto clr = decodeHexColor(to!string("#" ~ colorEdit.text));
@@ -113,6 +118,7 @@ auto constructSettingsWidget(ref Window w)
         catch(Exception ex)
         {
             wnd.showMessageBox("Error"d, to!dstring(ex.message));
+            return false;
         }
         w.invalidate();
         wnd.close();
