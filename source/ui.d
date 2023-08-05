@@ -42,6 +42,8 @@ struct Preferences
 {
     @ConfigProperty() string lastJson;
     @ConfigProperty() string keyColor = "00FF00";
+    @ConfigProperty() string pressedColor = "CCCCCC";
+    @ConfigProperty() string depressedColor = "777777";
     @ConfigProperty() int keySize = 48;
     @ConfigProperty() int keyOffset = 3;
 }
@@ -51,7 +53,7 @@ __gshared Preferences prefs;
 auto constructSettingsWidget(ref Window w)
 {
     import std.conv : to;
-    Window wnd = Platform.instance.createWindow("DBoard settings", null, 0, 300, 200);
+    Window wnd = Platform.instance.createWindow("DBoard settings", null, 0, 300, 300);
     VerticalLayout main = new VerticalLayout();
     main.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
     GroupBox sizes = new GroupBox("sizes", "Sizes"d);
@@ -75,6 +77,16 @@ auto constructSettingsWidget(ref Window w)
     colorEdit.text = to!dstring(prefs.keyColor);
     main.addChild(colorEdit);
 
+    main.addChild(new TextWidget("cPress", "Pressed color"d));
+    EditLine pressedColor = new EditLine();
+    pressedColor.text = to!dstring(prefs.pressedColor);
+    main.addChild(pressedColor);
+
+    main.addChild(new TextWidget("cDePress", "Depressed color"d));
+    EditLine depressedColor = new EditLine();
+    depressedColor.text = to!dstring(prefs.depressedColor);
+    main.addChild(depressedColor);
+
     Button apply = new Button("apply", "Apply"d);
     apply.click = delegate(Widget widg)
     {
@@ -89,33 +101,26 @@ auto constructSettingsWidget(ref Window w)
             {
                 throw new Exception("Please enter number!");
             }
-            if(colorEdit.text.length == 6)
-            {
-                foreach(ref k; colorEdit.text)
-                {
-                    import std.algorithm : any;
-                    if(!"0123456789ABCDEF"d.any!(a => a == k))
-                    {
-                        throw new Exception("Only 0-9 and A-F characters are accepted for color!");
-                    }
-                }
-                prefs.keyColor = to!string(colorEdit.text);
-            }
-            else
-            {
-                throw new Exception("Color must be 6 digits long!");
-            }
+            auto pressClr = decodeHexColor(to!string("#" ~ pressedColor.text));
+            auto deprClr = decodeHexColor(to!string("#" ~ depressedColor.text));
+            auto clr = decodeHexColor(to!string("#" ~ colorEdit.text));
+            if(pressClr == 0 || deprClr == 0 || clr == 0)
+                throw new Exception("Please enter a valid color (6 letter, only 0-F accepted)");
+            prefs.depressedColor = depressedColor.text.to!string;
+            prefs.pressedColor = pressedColor.text.to!string;
+            prefs.keyColor = colorEdit.text.to!string;
         }
         catch(Exception ex)
         {
             wnd.showMessageBox("Error"d, to!dstring(ex.message));
         }
         w.invalidate();
+        wnd.close();
         return true;
     };
     main.addChild(apply);
 
     wnd.mainWidget = main;
     wnd.show();
-    return main;
+    return wnd;
 }

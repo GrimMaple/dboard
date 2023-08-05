@@ -223,6 +223,13 @@ private:
         window.mainWidget = vl;
 
         KeyHook.get().OnAction = &onKeyHook;
+        reloadSettings();
+    }
+
+    void reloadSettings()
+    {
+        pressedColor = to!uint(prefs.pressedColor, 16);
+        depressedColor = to!uint(prefs.depressedColor, 16);
     }
 
     MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
@@ -301,7 +308,12 @@ private:
 
         sett.menuItemClick = delegate(MenuItem item)
         {
-            constructSettingsWidget(w);
+            Window wnd = constructSettingsWidget(w);
+            wnd.onClose = delegate()
+            {
+                reloadSettings();
+                figureOutWindowSize();
+            };
             return true;
         };
 
@@ -479,7 +491,7 @@ private:
         }
         foreach(i, ref keyDisp; keysDisp)
         {
-            immutable color = keysStates[keyDisp.keyCode] ? 0xCCCCCC : 0x777777;
+            immutable color = keysStates[keyDisp.keyCode] ? pressedColor : depressedColor;
             drawDisp(buf, c, keyDisp, color);
         }
 
@@ -508,7 +520,7 @@ private:
         immutable height = max(getLocOnGrid!(KeyEnd.Right)(maxy + keyOffset) + keyOffset, minHeight);
 
         // I don't know why dlnagui does this to me, but it sizes the window by 92 more pixels than requested
-        window.resizeWindow(Point(width-92, height-92));
+        window.resizeWindow(Point(width/*-92*/, height/*-92*/));
         return Point(width, height);
     }
 
@@ -556,6 +568,8 @@ private:
     bool dragTop = false;
     bool dragBottom = false;
     KeyDisplay* drag = null;
+
+    uint pressedColor, depressedColor;
 
     bool changingName = false;
 
