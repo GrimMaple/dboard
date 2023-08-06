@@ -9,6 +9,7 @@
         "x11": "~>1.0.21"
     },
     "libs-linux": ["Xi"],
+    "libs-windows": ["Comdlg32"],
     "description": "Keyboard Input Visualization Program",
     "license": "MIT",
     "name": "dboard"
