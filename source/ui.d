@@ -10,6 +10,8 @@ import io;
 import keystrings;
 import keys;
 
+import widgets.colorselector;
+
 import app;
 
 __gshared bool editMode = false;
@@ -73,25 +75,22 @@ auto constructSettingsWidget(ref Window w)
     main.addChild(sizes);
 
     main.addChild(new TextWidget("cText", "Background color"d));
-    EditLine colorEdit = new EditLine();
-    colorEdit.text = to!dstring(prefs.keyColor);
-    main.addChild(colorEdit);
+    main.addChild(new ColorSelector(prefs.keyColor, "bgSel"));
 
     main.addChild(new TextWidget("cPress", "Pressed color"d));
-    EditLine pressedColor = new EditLine();
-    pressedColor.text = to!dstring(prefs.pressedColor);
-    main.addChild(pressedColor);
+    main.addChild(new ColorSelector(prefs.pressedColor, "pressClr"));
 
     main.addChild(new TextWidget("cDePress", "Depressed color"d));
-    EditLine depressedColor = new EditLine();
-    depressedColor.text = to!dstring(prefs.depressedColor);
-    main.addChild(depressedColor);
+    main.addChild(new ColorSelector(prefs.depressedColor, "deprClr"));
 
     Button apply = new Button("apply", "Apply"d);
     apply.click = delegate(Widget widg)
     {
         try
         {
+            ColorSelector bg = wnd.mainWidget().childById!ColorSelector("bgSel");
+            ColorSelector press = wnd.mainWidget().childById!ColorSelector("pressClr");
+            ColorSelector depr = wnd.mainWidget().childById!ColorSelector("deprClr");
             int tmpSize, tmpOffset;
             try
             {
@@ -106,14 +105,9 @@ auto constructSettingsWidget(ref Window w)
             if(tmpOffset < 0) throw new Exception("Key offset can't be negative");
             keySize = tmpSize;
             keyOffset = tmpOffset;
-            auto pressClr = decodeHexColor(to!string("#" ~ pressedColor.text));
-            auto deprClr = decodeHexColor(to!string("#" ~ depressedColor.text));
-            auto clr = decodeHexColor(to!string("#" ~ colorEdit.text));
-            if(pressClr == 0 || deprClr == 0 || clr == 0)
-                throw new Exception("Please enter a valid color (6 letter, only 0-F accepted)");
-            prefs.depressedColor = depressedColor.text.to!string;
-            prefs.pressedColor = pressedColor.text.to!string;
-            prefs.keyColor = colorEdit.text.to!string;
+            prefs.keyColor = bg.color;
+            prefs.pressedColor = press.color;
+            prefs.depressedColor = depr.color;
         }
         catch(Exception ex)
         {

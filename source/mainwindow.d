@@ -215,7 +215,7 @@ private:
             return false;
         };
 
-        canvas.layoutWidth(FILL_PARENT).layoutHeight(400);
+        canvas.layoutWidth(FILL_PARENT).layoutHeight(6000);
         canvas.onDrawListener = &onDraw;
 
         vl.addChild(canvas);
@@ -568,6 +568,8 @@ private:
     bool dragTop = false;
     bool dragBottom = false;
     KeyDisplay* drag = null;
+
+    bool clicked = false;
 
     uint pressedColor, depressedColor;
 
