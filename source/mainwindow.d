@@ -482,7 +482,20 @@ private:
         buf.resize(window.width, window.height);
         buf.fill(to!uint(prefs.keyColor, 16));
 
-        c.fontFace = "Arial";
+        if(prefs.fontFace != "")
+        {
+            c.fontFace = prefs.fontFace;
+            c.fontSize = prefs.fontSize;
+            c.fontWeight = prefs.fontWeight;
+            c.fontItalic = prefs.fontItalic;
+        }
+        else
+        {
+            c.fontFace = "Arial";
+            c.fontSize = 13;
+            c.fontWeight = 700;
+            c.fontItalic = false;
+        }
 
         // Draw grid in edit mode
         if(editMode)

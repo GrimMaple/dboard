@@ -17,3 +17,4 @@ dboard-test-*
 *.dll
 launch.json
 ui.log
+prefs

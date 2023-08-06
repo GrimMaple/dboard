@@ -48,6 +48,10 @@ struct Preferences
     @ConfigProperty() string depressedColor = "777777";
     @ConfigProperty() int keySize = 48;
     @ConfigProperty() int keyOffset = 3;
+    @ConfigProperty() string fontFace = "";
+    @ConfigProperty() int fontSize = 0;
+    @ConfigProperty() int fontWeight = 0;
+    @ConfigProperty() bool fontItalic = false;
 }
 
 __gshared Preferences prefs;
@@ -82,6 +86,30 @@ auto constructSettingsWidget(ref Window w)
 
     main.addChild(new TextWidget("cDePress", "Depressed color"d));
     main.addChild(new ColorSelector(prefs.depressedColor, "deprClr"));
+
+    version(Windows)
+    {
+        Button font = cast(Button)(new Button().text("Key fonts"d));
+        font.click = delegate(Widget source)
+        {
+            import core.sys.windows.windows;
+            static LOGFONT logFont;
+            wstring cvt = prefs.fontFace.to!wstring;
+            logFont.lfHeight = prefs.fontSize;
+            logFont.lfFaceName[0 .. cvt.length] = cvt[0 .. $];
+            CHOOSEFONTW chooseFont;
+            chooseFont.Flags = CF_SCREENFONTS | CF_EFFECTS;
+            chooseFont.lpLogFont = &logFont;
+            if(!ChooseFontW(&chooseFont)) return true;
+            auto sz = wstrlen(logFont.lfFaceName.ptr);
+            prefs.fontFace = logFont.lfFaceName[0 .. sz].to!string;
+            prefs.fontSize = - logFont.lfHeight * 72 / GetDeviceCaps(GetDC(NULL), LOGPIXELSY);
+            prefs.fontWeight = logFont.lfWeight;
+            prefs.fontItalic = logFont.lfItalic != 0;
+            return true;
+        };
+        main.addChild(font);
+    }
 
     Button apply = new Button("apply", "Apply"d);
     apply.click = delegate(Widget widg)
@@ -123,4 +151,18 @@ auto constructSettingsWidget(ref Window w)
     wnd.mainWidget = main;
     wnd.show();
     return wnd;
+}
+
+version(Windows)
+{
+
+import core.sys.windows.windows;
+
+private size_t wstrlen(WCHAR* input)
+{
+    size_t ret = 0;
+    while(input[ret] != 0) ret++;
+    return ret;
+}
+
 }
