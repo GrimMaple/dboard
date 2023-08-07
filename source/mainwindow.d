@@ -525,15 +525,14 @@ private:
         float maxx = 0, maxy = 0;
         foreach(keyDisp; keysDisp)
         {
-            maxx = max(maxx, keyDisp.locx);
-            maxy = max(maxy, keyDisp.locy);
+            maxx = max(maxx, keyDisp.locx + keyDisp.w);
+            maxy = max(maxy, keyDisp.locy + keyDisp.h);
         }
 
-        immutable width = max(getLocOnGrid!(KeyEnd.Right)(maxx + keyOffset)+ keyOffset, minWidth);
-        immutable height = max(getLocOnGrid!(KeyEnd.Right)(maxy + keyOffset) + keyOffset, minHeight);
+        immutable width = max(getLocOnGrid!(KeyEnd.Right)(maxx + 0.5), minWidth);
+        immutable height = max(getLocOnGrid!(KeyEnd.Right)(maxy + 0.5), minHeight);
 
-        // I don't know why dlnagui does this to me, but it sizes the window by 92 more pixels than requested
-        window.resizeWindow(Point(width/*-92*/, height/*-92*/));
+        window.resizeWindow(Point(width, height));
         return Point(width, height);
     }
 
@@ -592,8 +591,8 @@ private:
 
     KeyDisplay* nameEditing = null;
 
-    immutable minWidth = 400;
-    immutable minHeight = 400;
+    immutable minWidth = 200;
+    immutable minHeight = 200;
 
     KeyDisplay n;
 

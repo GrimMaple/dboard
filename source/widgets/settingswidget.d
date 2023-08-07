@@ -15,6 +15,8 @@ class SettingsWidget : VerticalLayout
         sizes.layoutWidth(FILL_PARENT);
         widthEdit = new EditLine();
         spacingEdit = new EditLine();
+        widthEdit.text = prefs.keySize.to!dstring;
+        spacingEdit.text = prefs.keyOffset.to!dstring;
 
         sizes.addChild(new TextWidget("", "SETTINGS_SIDE_SIZE"));
         sizes.addChild(widthEdit);
