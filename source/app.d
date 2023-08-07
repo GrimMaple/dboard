@@ -52,6 +52,8 @@ void storePreferences()
 extern(C) int UIAppMain()
 {
     loadPreferences();
+    embeddedResourceList.addResources(embedResourcesFromList!("resources.list")());
+    Platform.instance.uiLanguage = "en";
     auto window = new MainWindow();
     immutable res = Platform.instance.enterMessageLoop();
     storePreferences();

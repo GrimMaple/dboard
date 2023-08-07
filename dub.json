@@ -8,6 +8,7 @@
         "mud": "~>0.2.0",
         "x11": "~>1.0.21"
     },
+    "stringImportPaths": ["views", "views/res/i18n"],
     "libs-linux": ["Xi"],
     "libs-windows": ["Comdlg32"],
     "description": "Keyboard Input Visualization Program",
