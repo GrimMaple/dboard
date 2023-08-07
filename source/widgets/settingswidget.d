@@ -1,9 +1,12 @@
 module widgets.settingswidget;
 
+import std.algorithm : countUntil;
+
 import dlangui;
 
 import widgets.colorselector;
 import ui;
+import preferences;
 
 class SettingsWidget : VerticalLayout
 {
@@ -24,6 +27,9 @@ class SettingsWidget : VerticalLayout
         sizes.addChild(spacingEdit);
         addChild(sizes);
 
+        addChild(new TextWidget("", "SETTINGS_LANGUAGE"));
+        addChild(new ComboBox("langs", ["LANG_EN", "LANG_RU"]));
+
         addChild(new TextWidget("", "SETTINGS_BACKGROUND_COLOR"));
         addChild(new ColorSelector(prefs.keyColor, "bgSel"));
         bg = childById!ColorSelector("bgSel");
@@ -35,6 +41,8 @@ class SettingsWidget : VerticalLayout
         addChild(new TextWidget("cDePress", "SETTINGS_DEPRESSED_COLOR"));
         addChild(new ColorSelector(prefs.depressedColor, "deprClr"));
         depr = childById!ColorSelector("deprClr");
+
+        selectLocale();
 
         version(Windows)
         {
@@ -81,6 +89,7 @@ class SettingsWidget : VerticalLayout
                 prefs.keyColor = bg.color;
                 prefs.pressedColor = press.color;
                 prefs.depressedColor = depr.color;
+                prefs.locale = getLocaleString();
             }
             catch(Exception ex)
             {
@@ -94,6 +103,17 @@ class SettingsWidget : VerticalLayout
         addChild(apply);
     }
 private:
+    void selectLocale()
+    {
+        static immutable langs = ["en", "ru"];
+        childById!ComboBox("langs").selectedItemIndex = cast(int)langs.countUntil!(x => x == prefs.locale);
+    }
+
+    string getLocaleString()
+    {
+        static immutable langs = ["en", "ru"];
+        return langs[childById!ComboBox("langs").selectedItemIndex()];
+    }
     version(Windows)
     {
         import core.sys.windows.windef : WCHAR;

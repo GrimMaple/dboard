@@ -10,6 +10,7 @@ import keys;
 import ui;
 import util;
 import io;
+import preferences;
 
 /// UI Main Window
 class MainWindow
@@ -230,6 +231,7 @@ private:
     {
         pressedColor = to!uint(prefs.pressedColor, 16);
         depressedColor = to!uint(prefs.depressedColor, 16);
+        Platform.instance.uiLanguage = prefs.locale;
     }
 
     MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)

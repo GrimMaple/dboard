@@ -17,6 +17,7 @@ import io;
 import util;
 
 import mainwindow;
+import preferences;
 
 mixin APP_ENTRY_POINT;
 
