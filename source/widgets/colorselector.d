@@ -20,8 +20,7 @@ class ColorSelector : HorizontalLayout
         version(Windows)
         {
             line.enabled = false;
-            auto btn = new Button();
-            btn.text = "..."d;
+            auto btn = new Button("", "THREEDOTS");
             btn.click = delegate(Widget source)
             {
                 static COLORREF[16] custClr;

@@ -82,7 +82,7 @@ class SettingsWidget : VerticalLayout
             }
             catch(Exception ex)
             {
-                window().showMessageBox("Error"d, to!dstring(ex.message));
+                window().showMessageBox(UIString.fromId("ERROR"), to!dstring(ex.message));
                 return false;
             }
             //w.invalidate();

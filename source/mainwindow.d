@@ -178,7 +178,7 @@ private:
                 {
 
                     MenuItem itm = new MenuItem();
-                    MenuItem del = new MenuItem(new Action(0, "Delete"d));
+                    MenuItem del = new MenuItem(new Action(0, "MENU_DELETE"));
                     del.menuItemClick = delegate(MenuItem item)
                     {
                         keysDisp = keysDisp[0 .. i] ~ keysDisp[i+1 .. $];
@@ -186,7 +186,7 @@ private:
                         return true;
                     };
 
-                    MenuItem txt = new MenuItem(new Action(1, "Change text"d));
+                    MenuItem txt = new MenuItem(new Action(1, "MENU_CHANGE_TEXT"));
                     txt.menuItemClick = delegate(MenuItem item)
                     {
                         immutable pt = Point(event.x, event.y);
@@ -240,10 +240,10 @@ private:
         }
         MenuItem mainMenu = new MenuItem();
         mainMenu.clear();
-        MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
-        MenuItem load = new MenuItem(new Action(2, "Load file"d));
-        MenuItem save = new MenuItem(new Action(3, "Save file"d));
-        MenuItem sett = new MenuItem(new Action(4, "Settings"d));
+        MenuItem sub = new MenuItem(new Action(0, "MENU_EDIT_MODE"));
+        MenuItem load = new MenuItem(new Action(2, "MENU_LOAD"));
+        MenuItem save = new MenuItem(new Action(3, "MENU_SAVE"));
+        MenuItem sett = new MenuItem(new Action(4, "MENU_SETTINGS"));
         mainMenu.add(sub);
         sub.menuItemClick = delegate(MenuItem item)
         {
@@ -261,7 +261,7 @@ private:
 
         load.menuItemClick = delegate(MenuItem item)
         {
-            FileDialog dlg = new FileDialog(UIString.fromRaw("Open file"), w, null);
+            FileDialog dlg = new FileDialog(UIString.fromId("OPEN"), w, null);
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
@@ -327,8 +327,8 @@ private:
     {
         MenuItem mainMenu = new MenuItem();
         mainMenu.clear();
-        MenuItem sub = new MenuItem(new Action(0, "Toggle edit"d));
-        MenuItem subAdd = new MenuItem(new Action(1, "Add new"d));
+        MenuItem sub = new MenuItem(new Action(0, "MENU_EDIT_MODE"));
+        MenuItem subAdd = new MenuItem(new Action(1, "MENU_ADD"));
         mainMenu.add(sub);
         sub.menuItemClick = delegate(MenuItem item)
         {
@@ -350,7 +350,7 @@ private:
         };
         mainMenu.add(subAdd);
 
-        MenuItem clear = new MenuItem(new Action(666, "Clear"d));
+        MenuItem clear = new MenuItem(new Action(666, "MENU_CLEAR"));
         clear.menuItemClick = delegate(MenuItem itm)
         {
             keysDisp = new KeyDisplay[0];
