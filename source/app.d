@@ -7,7 +7,7 @@ import dlangui;
 import dlangui.dialogs.dialog;
 import dlangui.dialogs.filedlg;
 
-import mud.config;
+import mud.serialization.json;
 
 import keyboard;
 import keystrings;
@@ -24,7 +24,16 @@ void loadPreferences()
 {
     import std.file : exists, readText;
     if(exists("prefs"))
-        deserializeConfig(prefs, "prefs");
+    {
+        try
+        {
+            prefs = deserializeJSON!Preferences(parseJSON(readText("prefs")));
+        }
+        catch(Exception ex)
+        {
+            remove("prefs");
+        }
+    }
 
     if(prefs.lastJson != "")
     {
@@ -35,7 +44,9 @@ void loadPreferences()
 
 void storePreferences()
 {
-    serializeConfig(prefs, "prefs");
+    import std.file : wt = write;
+    auto res = serializeJSON(prefs);
+    wt("prefs", toJSON(res));
 }
 
 extern(C) int UIAppMain()

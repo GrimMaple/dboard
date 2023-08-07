@@ -5,7 +5,7 @@
     "copyright": "Copyright © 2021, Grim Maple",
     "dependencies": {
         "dlangui": "~>0.10.4",
-        "mud": "~>0.1.0",
+        "mud": "~>0.2.0",
         "x11": "~>1.0.21"
     },
     "libs-linux": ["Xi"],

@@ -1,24 +1,26 @@
 module keys;
 
+import mud.serialization;
+
 import keystrings;
 
 /// Key display information
 struct KeyDisplay
 {
     /// Key display logical X position
-    float locx = 0;
+    @serializable float locx = 0;
 
     /// Key display logical Y position
-    float locy = 0;
+    @serializable float locy = 0;
     
     /// VK code for this key display
-    int keyCode = 0;
+    @serializable int keyCode = 0;
 
     /// Key display logical width
-    float w = 1;
+    @serializable float w = 1;
     
     /// Key display logical height
-    float h = 1;
+    @serializable float h = 1;
 
     /// Does this `KeyDisplay` have a custom display string
     @property bool hasVisibleString()

@@ -12,6 +12,8 @@ import keys;
 
 import widgets.colorselector;
 
+import mud.serialization;
+
 import app;
 
 __gshared bool editMode = false;
@@ -42,16 +44,16 @@ __gshared KeyDisplay[] keysDisp = new KeyDisplay[0];
 
 struct Preferences
 {
-    @ConfigProperty() string lastJson;
-    @ConfigProperty() string keyColor = "00FF00";
-    @ConfigProperty() string pressedColor = "CCCCCC";
-    @ConfigProperty() string depressedColor = "777777";
-    @ConfigProperty() int keySize = 48;
-    @ConfigProperty() int keyOffset = 3;
-    @ConfigProperty() string fontFace = "";
-    @ConfigProperty() int fontSize = 0;
-    @ConfigProperty() int fontWeight = 0;
-    @ConfigProperty() bool fontItalic = false;
+    @serializable string lastJson;
+    @serializable string keyColor = "00FF00";
+    @serializable string pressedColor = "CCCCCC";
+    @serializable string depressedColor = "777777";
+    @serializable int keySize = 48;
+    @serializable int keyOffset = 3;
+    @serializable string fontFace = "";
+    @serializable int fontSize = 0;
+    @serializable int fontWeight = 0;
+    @serializable bool fontItalic = false;
 }
 
 __gshared Preferences prefs;
