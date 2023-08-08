@@ -67,8 +67,24 @@ class SettingsWidget : VerticalLayout
             };
             addChild(font);
         }
-        Button apply = new Button("", "APPLY");
-        apply.click = delegate(Widget widg)
+        HorizontalLayout controls = parseML!HorizontalLayout(q{
+            HorizontalLayout {
+                Button {
+                    id: apply
+                    text: APPLY
+                }
+                Button {
+                    id: cancel
+                    text: CANCEL
+                }
+            }
+        });
+        controls.childById!Button("cancel").click = delegate(Widget wdgt)
+        {
+            window().close();
+            return true;
+        };
+        controls.childById!Button("apply").click = delegate(Widget widg)
         {
             try
             {
@@ -96,11 +112,10 @@ class SettingsWidget : VerticalLayout
                 window().showMessageBox(UIString.fromId("ERROR"), to!dstring(ex.message));
                 return false;
             }
-            //w.invalidate();
             window().close();
             return true;
         };
-        addChild(apply);
+        addChild(controls);
     }
 private:
     void selectLocale()
