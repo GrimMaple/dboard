@@ -1,5 +1,7 @@
 module util;
 
+import preferences;
+
 /// Rounds to lesser .0, .5, or greater .0
 float threeWayRound(float input)
 {
@@ -20,4 +22,18 @@ bool isWhole(T)(T f) if(__traits(isFloating, T))
     if(f - trunc(f) != 0)
         return false;
     return true;
+}
+
+int getLocOnGrid(KeyEnd end = KeyEnd.Left)(float gridPos)
+{
+    static if(end == KeyEnd.Left)
+        return keyOffset + cast(int)(cast(int)(gridPos) * keyOffset + gridPos * keySize);
+    else
+        return getLocOnGrid!(KeyEnd.Left)(gridPos) - keyOffset;
+}
+
+enum KeyEnd
+{
+    Left,
+    Right
 }

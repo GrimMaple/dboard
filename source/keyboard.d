@@ -8,6 +8,8 @@ enum KeyState
     Down
 }
 
+bool[] pressedKeys = new bool[256];
+
 version(Windows)
 {
 
@@ -108,6 +110,7 @@ class KeyHook
             }
             try
             {
+                pressedKeys[vkCode] = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
                 if(KeyHook.get().OnAction !is null)
                     KeyHook.get().OnAction(vkCode, (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? KeyState.Down : KeyState.Up);
             }

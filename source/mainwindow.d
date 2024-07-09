@@ -11,6 +11,7 @@ import ui;
 import util;
 import io;
 import preferences;
+import widgets.gridview;
 
 /// UI Main Window
 class MainWindow
@@ -30,6 +31,16 @@ private:
         immutable sizes = figureOutWindowSize();
         keysStates[] = false;
 
+        //window.mainWidget = editableCanvas();
+        auto grid = new GridView();
+        grid.setDrawables(keysDisp);
+        window.mainWidget = grid;
+        KeyHook.get().OnAction = &onKeyHook;
+        reloadSettings();
+    }
+
+    auto editableCanvas()
+    {
         VerticalLayout vl = new VerticalLayout();
         vl.fillParent();
         canvas = new CanvasWidget("canvas");
@@ -218,13 +229,8 @@ private:
 
         canvas.layoutWidth(FILL_PARENT).layoutHeight(6000);
         canvas.onDrawListener = &onDraw;
-
         vl.addChild(canvas);
-
-        window.mainWidget = vl;
-
-        KeyHook.get().OnAction = &onKeyHook;
-        reloadSettings();
+        return vl;
     }
 
     void reloadSettings()
@@ -385,7 +391,8 @@ private:
         code = vkCode;
         keysStates[code] = (state == KeyState.Down) ? true : false;
         gstate = state;
-        canvas.invalidate();
+        //canvas.invalidate();
+        window.mainWidget.invalidate();
         window.invalidate();
     }
 
@@ -478,12 +485,8 @@ private:
         c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, 0x0);
     }
 
-    void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
+    void setFont(CanvasWidget c)
     {
-        import std.conv : to;
-        buf.resize(window.width, window.height);
-        buf.fill(to!uint(prefs.keyColor, 16));
-
         if(prefs.fontFace != "")
         {
             c.fontFace = prefs.fontFace;
@@ -498,6 +501,15 @@ private:
             c.fontWeight = 700;
             c.fontItalic = false;
         }
+    }
+
+    void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
+    {
+        import std.conv : to;
+        buf.resize(window.width, window.height);
+        buf.fill(to!uint(prefs.keyColor, 16));
+
+        setFont(c);
 
         // Draw grid in edit mode
         if(editMode)
@@ -567,12 +579,6 @@ private:
     bool[] keysStates = new bool[256];
 
     KeyDisplay temporary;
-
-    enum KeyEnd
-    {
-        Left,
-        Right
-    }
 
     Window window = null;
     CanvasWidget canvas = null;
