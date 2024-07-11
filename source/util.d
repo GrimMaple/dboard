@@ -32,6 +32,11 @@ int getLocOnGrid(KeyEnd end = KeyEnd.Left)(float gridPos)
         return getLocOnGrid!(KeyEnd.Left)(gridPos) - keyOffset;
 }
 
+float getGridLoc(int val)
+{
+    return cast(float)(val - keyOffset)/cast(float)(keyOffset + keySize);
+}
+
 enum KeyEnd
 {
     Left,

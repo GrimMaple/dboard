@@ -31,9 +31,9 @@ private:
         immutable sizes = figureOutWindowSize();
         keysStates[] = false;
 
-        //window.mainWidget = editableCanvas();
         auto grid = new GridView();
         grid.setDrawables(keysDisp);
+        grid.popupMenu = constructMainMenu(window, grid.canvasWidget);
         window.mainWidget = grid;
         KeyHook.get().OnAction = &onKeyHook;
         reloadSettings();
@@ -41,196 +41,10 @@ private:
 
     auto editableCanvas()
     {
-        VerticalLayout vl = new VerticalLayout();
-        vl.fillParent();
-        canvas = new CanvasWidget("canvas");
-        canvas.fillParent();
-
-        canvas.popupMenu = constructMainMenu(window, canvas);
-
-        canvas.mouseEvent = delegate(Widget source, MouseEvent event)
-        {
-            import std.math : abs;
-            canvas.popupMenu = constructMainMenu(window, canvas);
-            if(!editMode)
-            {
-                return false;
-            }
-            if(addMode)
-            {
-                n.locx = threeWayRound(getGridLoc(event.x));
-                n.locy = threeWayRound(getGridLoc(event.y));
-                if(event.lbutton.isDown)
-                {
-                    KeyDisplay copy = n;
-                    keysDisp ~= [copy];
-                    addMode = false;
-                }
-                canvas.invalidate();
-                window.invalidate();
-                return true;
-            }
-            if(event.rbutton.isDown && changingHotkey)
-            {
-                return true;
-            }
-            if(event.lbutton.doubleClick && !changingName && !changingHotkey)
-            {
-                nameEditing = selectDispAtPosition(Point(event.x, event.y));
-                if(nameEditing !is null)
-                {
-                    changingHotkey = true;
-                }
-                return true;
-            }
-            if(event.lbutton.isDown)
-            {
-                if(changingHotkey)
-                {
-                    changingHotkey = false;
-                    nameEditing = null;
-                    return true;
-                }
-                cancelEditing(vl);
-                if(dragRight)
-                {
-                    drag.w = threeWayRound(getGridLoc(event.x) - drag.locx);
-                    if(drag.w < 0.5 )
-                        drag.w = 0.5;
-                    canvas.invalidate();
-                    window.invalidate();
-                    return true;
-                }
-                else if(dragLeft)
-                {
-                    immutable save = drag.locx;
-                    immutable locxx = drag.locx + drag.w;
-                    if(locxx - threeWayRound(getGridLoc(event.x)) >= 0.5)
-                    {
-                        drag.locx = threeWayRound(getGridLoc(event.x));
-                        drag.w = locxx - drag.locx; // Increase the width of the visible item
-                    }
-                    return true;
-                }
-                else if(dragTop)
-                {
-                    immutable save = drag.locy;
-                    immutable locyy = drag.locy + drag.h;
-                    if(locyy - threeWayRound(getGridLoc(event.y)) >= 0.5)
-                    {
-                        drag.locy = threeWayRound(getGridLoc(event.y));
-                        drag.h = locyy - drag.locy; // Increase the width of visible item
-                    }
-                    return true;
-                }
-                else if(dragBottom)
-                {
-                    drag.h = threeWayRound(getGridLoc(event.y) - drag.locy);
-                    if(drag.h < 0.5 )
-                        drag.h = 0.5;
-                    canvas.invalidate();
-                    window.invalidate();
-                    return true;
-                }
-                else if(drag !is null) // Drag the whole button
-                {
-                    if(!hasOffset)
-                    {
-                        hasOffset = true;
-                        xoffs = getLocOnGrid(drag.locx) - event.x;
-                        yoffs = getLocOnGrid(drag.locy) - event.y;
-                    }
-                    drag.locx = threeWayRound(getGridLoc(event.x + xoffs));
-                    drag.locy = threeWayRound(getGridLoc(event.y + yoffs));
-                    canvas.invalidate();
-                    window.invalidate();
-                    return true;
-                }
-            }
-            foreach(i, ref disp; keysDisp)
-            {
-                if(withinGridRange(event.y, disp.locy, disp.locy + disp.h))
-                {
-                    resetDragProperties();
-                    if(abs(getLocOnGrid!(KeyEnd.Left)(disp.locx) - event.x) < 5)
-                    {
-                        dragLeft = true;
-                        window.overrideCursorType(CursorType.SizeWE);
-                        drag = &disp;
-                        return true;
-                    }
-                    if(abs(getLocOnGrid!(KeyEnd.Right)(disp.locx + disp.w) - event.x) < 5)
-                    {
-                        dragRight = true;
-                        drag = &disp;
-                        window.overrideCursorType(CursorType.SizeWE);
-                        return true;
-                    }
-                }
-                if(withinGridRange(event.x, disp.locx, disp.locx + disp.w))
-                {
-                    resetDragProperties();
-                    if(abs(getLocOnGrid!(KeyEnd.Left)(disp.locy) - event.y) < 5)
-                    {
-                        dragTop = true;
-                        window.overrideCursorType(CursorType.SizeNS);
-                        drag = &disp;
-                        return true;
-                    }
-                    if(abs(getLocOnGrid!(KeyEnd.Right)(disp.locy + disp.h) - event.y) < 5)
-                    {
-                        dragBottom = true;
-                        drag = &disp;
-                        window.overrideCursorType(CursorType.SizeNS);
-                        return true;
-                    }
-                }
-                if(withinGridRange(event.y, disp.locy, disp.locy + disp.h) &&
-                withinGridRange(event.x, disp.locx, disp.locx + disp.w))
-                {
-
-                    MenuItem itm = new MenuItem();
-                    MenuItem del = new MenuItem(new Action(0, "MENU_DELETE"));
-                    del.menuItemClick = delegate(MenuItem item)
-                    {
-                        keysDisp = keysDisp[0 .. i] ~ keysDisp[i+1 .. $];
-                        canvas.popupMenu = constructMainMenu(window, canvas);
-                        return true;
-                    };
-
-                    MenuItem txt = new MenuItem(new Action(1, "MENU_CHANGE_TEXT"));
-                    txt.menuItemClick = delegate(MenuItem item)
-                    {
-                        immutable pt = Point(event.x, event.y);
-                        enableTextEditing(pt, vl);
-                        return true;
-                    };
-
-                    itm.add(del);
-                    itm.add(txt);
-
-                    canvas.popupMenu = itm;
-                    resetDragProperties();
-                    drag = &disp;
-                    window.overrideCursorType(CursorType.SizeAll);
-                    return false;
-                }
-            }
-            resetDragProperties();
-            canvas.popupMenu = constructMainMenu(window, canvas);
-            window.overrideCursorType(CursorType.Arrow);
-            return false;
-        };
-
-        canvas.keyEvent = delegate(Widget source, KeyEvent event)
-        {
-            return false;
-        };
-
-        canvas.layoutWidth(FILL_PARENT).layoutHeight(6000);
-        canvas.onDrawListener = &onDraw;
-        vl.addChild(canvas);
-        return vl;
+        auto ed = new EditableView();
+        ed.setDrawables(keysDisp);
+        ed.popupMenu = constructMainMenuInEditing(window, ed.canvasWidget);
+        return ed;
     }
 
     void reloadSettings()
@@ -240,7 +54,7 @@ private:
         Platform.instance.uiLanguage = prefs.locale;
     }
 
-    MenuItem constructMainMenu(ref Window w, ref CanvasWidget c)
+    MenuItem constructMainMenu(Window w, CanvasWidget c)
     {
         if(editMode)
         {
@@ -264,6 +78,7 @@ private:
             {
             c.popupMenu = constructMainMenu(w, c);
             }
+            window.executeInUiThread(() => window.mainWidget = editableCanvas());
             return true;
         };
 
@@ -331,7 +146,7 @@ private:
         return mainMenu;
     }
 
-    MenuItem constructMainMenuInEditing(ref Window w, ref CanvasWidget c)
+    MenuItem constructMainMenuInEditing(Window w, CanvasWidget c)
     {
         MenuItem mainMenu = new MenuItem();
         mainMenu.clear();
@@ -349,6 +164,10 @@ private:
             {
                 c.popupMenu = constructMainMenu(w, c);
             }
+            auto grid = new GridView();
+            grid.setDrawables(keysDisp);
+            grid.popupMenu = constructMainMenu(window, grid.canvasWidget);
+            window.executeInUiThread(() => window.mainWidget = grid);
             return true;
         };
         subAdd.menuItemClick = delegate(MenuItem item)
@@ -371,13 +190,13 @@ private:
 
     void onKeyHook(int vkCode, KeyState state)
     {
-        if(changingHotkey)
+        /*if(changingHotkey)
         {
             nameEditing.keyCode = vkCode;
             nameEditing = null;
             changingHotkey = false;
-        }
-        if(addMode && state == KeyState.Down)
+        }*/
+        /*if(addMode && state == KeyState.Down)
         {
             if(n.keyCode == 0x1B && vkCode == 0x1B) // ESCAPE
             {
@@ -387,90 +206,12 @@ private:
             {
                 n.keyCode = vkCode;
             }
-        }
+        }*/
         code = vkCode;
         keysStates[code] = (state == KeyState.Down) ? true : false;
         gstate = state;
-        //canvas.invalidate();
         window.mainWidget.invalidate();
         window.invalidate();
-    }
-
-    void resetDragProperties()
-    {
-        drag = null;
-        hasOffset = false;
-        dragLeft = false;
-        dragRight = false;
-        dragTop = false;
-        dragBottom = false;
-    }
-
-    void cancelEditing(VerticalLayout vl)
-    {
-        if(changingName && nameEditing)
-        {
-            changingName = false;
-            nameEditing.visibleString = vl.childById!EditLine("editText").text;
-            nameEditing = null;
-            vl.removeChild("editText");
-            vl.invalidate();
-        }
-    }
-
-    KeyDisplay* selectDispAtPosition(in Point loc)
-    {
-        foreach(i, ref disp; keysDisp)
-        {
-            if(withinGridRange(loc.y, disp.locy, disp.locy + disp.h) &&
-                withinGridRange(loc.x, disp.locx, disp.locx + disp.w))
-            {
-                return &disp;
-            }
-        }
-        return null;
-    }
-
-    bool enableTextEditing(in Point loc, VerticalLayout vl)
-    {
-        EditLine textEdit = new EditLine("editText");
-        textEdit.layoutHeight(30).layoutWidth(FILL_PARENT);
-        textEdit.visibility = Visibility.Invisible;
-
-        textEdit.enterKey = delegate(EditWidgetBase w)
-        {
-            cancelEditing(vl);
-            return true;
-        };
-
-
-        nameEditing = selectDispAtPosition(loc);
-        if(nameEditing !is null)
-        {
-            vl.addChild(textEdit);
-            textEdit.text = nameEditing.visibleString();
-            textEdit.visibility = Visibility.Visible;
-            changingName = true;
-            textEdit.setFocus();
-            return true;
-        }
-        return false;
-    }
-
-    void drawGrid(DrawBuf buf)
-    {
-        int x = keyOffset;
-        while(x < window.width)
-        {
-            buf.drawLine(Point(x, 0), Point(x, window.height), 0x0);
-            x += keyOffset + keySize;
-        }
-        int y = keyOffset;
-        while(y <= window.height)
-        {
-            buf.drawLine(Point(0, y), Point(window.width, y), 0);
-            y += keyOffset + keySize;
-        }
     }
 
     void drawDisp(DrawBuf buf, CanvasWidget c, ref KeyDisplay disp, uint color)
@@ -500,36 +241,6 @@ private:
             c.fontSize = 13;
             c.fontWeight = 700;
             c.fontItalic = false;
-        }
-    }
-
-    void onDraw(CanvasWidget c, DrawBuf buf, Rect rc)
-    {
-        import std.conv : to;
-        buf.resize(window.width, window.height);
-        buf.fill(to!uint(prefs.keyColor, 16));
-
-        setFont(c);
-
-        // Draw grid in edit mode
-        if(editMode)
-        {
-            drawGrid(buf);
-        }
-        foreach(i, ref keyDisp; keysDisp)
-        {
-            immutable color = keysStates[keyDisp.keyCode] ? pressedColor : depressedColor;
-            drawDisp(buf, c, keyDisp, color);
-        }
-
-        if(addMode)
-        {
-            drawDisp(buf, c, n, 0x99999999);
-        }
-
-        if(changingHotkey)
-        {
-            drawDisp(buf, c, *nameEditing, 0x00AAFF);
         }
     }
 
@@ -563,47 +274,18 @@ private:
         return cast(float)(val - keyOffset)/cast(float)(keyOffset + keySize);
     }
 
-    bool withinGridRange(int coord, float a, float b)
-    {
-        import std.algorithm : min, max;
-
-        if(coord >= getLocOnGrid!(KeyEnd.Left)(min(a, b)) &&
-        coord <= getLocOnGrid!(KeyEnd.Right)(max(a, b)))
-            return true;
-        return false;
-    }
-
     int code = 0;
     KeyState gstate = KeyState.Up;
 
     bool[] keysStates = new bool[256];
 
-    KeyDisplay temporary;
-
     Window window = null;
     CanvasWidget canvas = null;
-
-    bool dragLeft = false;
-    bool dragRight = false;
-    bool dragTop = false;
-    bool dragBottom = false;
-    KeyDisplay* drag = null;
 
     bool clicked = false;
 
     uint pressedColor, depressedColor;
 
-    bool changingName = false;
-
-    bool changingHotkey = false;
-
-    KeyDisplay* nameEditing = null;
-
     immutable minWidth = 200;
     immutable minHeight = 200;
-
-    KeyDisplay n;
-
-    bool hasOffset = false;
-    int xoffs = 0, yoffs = 0;
 }
