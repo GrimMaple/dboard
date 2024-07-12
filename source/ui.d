@@ -20,12 +20,3 @@ __gshared bool editMode = false;
 __gshared bool addMode = false;
 
 __gshared KeyDisplay[] keysDisp = new KeyDisplay[0];
-
-auto constructSettingsWidget(ref Window w)
-{
-    import std.conv : to;
-    Window wnd = Platform.instance.createWindow("DBoard settings", null, 0, 300, 350);
-    wnd.mainWidget = new SettingsWidget();
-    wnd.show();
-    return wnd;
-}
