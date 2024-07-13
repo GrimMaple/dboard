@@ -6,12 +6,14 @@ struct Preferences
 {
     @serializable string lastJson;
     @serializable string keyColor = "00FF00";
-    @serializable string pressedColor = "CCCCCC";
-    @serializable string depressedColor = "777777";
+    @serializable string pressedColor = "6D6C77";
+    @serializable string depressedColor = "37313B";
+    @serializable string textColor = "AAAAAA";
+    @serializable string textPressedColor = "AAAAAA";
     @serializable int keySize = 48;
     @serializable int keyOffset = 3;
-    @serializable string fontFace = "";
-    @serializable int fontSize = 0;
+    @serializable string fontFace = "Unispace";
+    @serializable int fontSize = 14;
     @serializable int fontWeight = 0;
     @serializable bool fontItalic = false;
     @serializable string locale = "en";

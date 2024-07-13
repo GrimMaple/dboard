@@ -48,7 +48,8 @@ class KeyDrawable : GridDrawable
         immutable pxWidth = getLocOnGrid!(KeyEnd.Right)(disp.locx + disp.w) - getLocOnGrid!(KeyEnd.Left)(disp.locx);
         immutable pxHeight = getLocOnGrid!(KeyEnd.Right)(disp.locy + disp.h) - getLocOnGrid!(KeyEnd.Left)(disp.locy);
         buf.fillRect(Rect(x, y, x + pxWidth, y + pxHeight), doesOverrideColor ? overrideColor : color);
-        c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, 0x0);
+        immutable textColor = to!uint(pressed ? prefs.textPressedColor : prefs.textColor, 16);
+        c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, textColor);
     }
 
     @property bool pressed() { return pressedKeys[disp.keyCode]; }
@@ -223,7 +224,7 @@ private:
     auto constructSettingsWidget(ref Window w)
     {
         import std.conv : to;
-        Window wnd = Platform.instance.createWindow("DBoard settings", null, 0, 300, 350);
+        Window wnd = Platform.instance.createWindow("DBoard settings", null, 0, 300, 430);
         wnd.mainWidget = new SettingsWidget();
         wnd.show();
         return wnd;

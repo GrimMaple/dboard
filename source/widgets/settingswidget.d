@@ -42,7 +42,22 @@ class SettingsWidget : VerticalLayout
         addChild(new ColorSelector(prefs.depressedColor, "deprClr"));
         depr = childById!ColorSelector("deprClr");
 
+        addChild(new TextWidget("cTextClr", "SETTINGS_TEXT_COLOR"));
+        addChild(new ColorSelector(prefs.textColor, "textClr"));
+        textClr = childById!ColorSelector("textClr");
+
+        addChild(new TextWidget("cTextPressClr", "SETTINGS_TEXT_PRESSED_COLOR"));
+        addChild(new ColorSelector(prefs.textPressedColor, "textPressedClr"));
+        textPressedClr = childById!ColorSelector("textPressedClr");
+
         selectLocale();
+
+        childById!ComboBox("langs").itemClick = delegate(Widget source, int itemIndex)
+        {
+            prefs.locale = getLocaleString();
+            Platform.instance.uiLanguage = prefs.locale;
+            return false;
+        };
 
         version(Windows)
         {
@@ -96,20 +111,23 @@ class SettingsWidget : VerticalLayout
                 }
                 catch(Exception ex)
                 {
-                    throw new Exception("Please enter numbers for key size and offset!");
+                    throw new Exception("ERROR_OFFSET_NOT_NUMBER");
                 }
-                if(tmpSize < 1) throw new Exception("Key size can't be less than 1");
-                if(tmpOffset < 0) throw new Exception("Key offset can't be negative");
+                if(tmpSize < 1) throw new Exception("ERROR_KEY_SIZE_LESS_THAN_ONE");
+                if(tmpOffset < 0) throw new Exception("ERROR_KEY_OFFSET_NEGATIVE");
                 keySize = tmpSize;
                 keyOffset = tmpOffset;
                 prefs.keyColor = bg.color;
                 prefs.pressedColor = press.color;
                 prefs.depressedColor = depr.color;
+                prefs.textColor = textClr.color;
+                prefs.textPressedColor = textPressedClr.color;
                 prefs.locale = getLocaleString();
+                Platform.instance.uiLanguage = prefs.locale;
             }
             catch(Exception ex)
             {
-                window().showMessageBox(UIString.fromId("ERROR"), to!dstring(ex.message));
+                window().showMessageBox(UIString.fromId("ERROR"), UIString.fromId(cast(string)ex.message));
                 return false;
             }
             window().close();
@@ -144,4 +162,6 @@ private:
     ColorSelector bg;
     ColorSelector press;
     ColorSelector depr;
+    ColorSelector textClr;
+    ColorSelector textPressedClr;
 }
