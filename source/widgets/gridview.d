@@ -24,6 +24,11 @@ interface EditToggleHandler
     void onEditToggled(Widget source);
 }
 
+interface RefreshStuffHandler
+{
+    void onRefreshThings(Widget source);
+}
+
 class KeyDrawable : GridDrawable
 {
     this(KeyDisplay disp)
@@ -42,13 +47,28 @@ class KeyDrawable : GridDrawable
         immutable y = getLocOnGrid!(KeyEnd.Left)(disp.locy);
         immutable pxWidth = getLocOnGrid!(KeyEnd.Right)(disp.locx + disp.w) - getLocOnGrid!(KeyEnd.Left)(disp.locx);
         immutable pxHeight = getLocOnGrid!(KeyEnd.Right)(disp.locy + disp.h) - getLocOnGrid!(KeyEnd.Left)(disp.locy);
-        buf.fillRect(Rect(x, y, x + pxWidth, y + pxHeight), color);
+        buf.fillRect(Rect(x, y, x + pxWidth, y + pxHeight), doesOverrideColor ? overrideColor : color);
         c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, 0x0);
     }
 
     @property bool pressed() { return pressedKeys[disp.keyCode]; }
 
+    void setOverrideColor(uint color)
+    {
+        overrideColor = color;
+        doesOverrideColor = true;
+    }
+
+    void resetOverrideColor()
+    {
+        doesOverrideColor = false;
+    }
+
     KeyDisplay disp;
+
+private:
+    uint overrideColor = 0;
+    bool doesOverrideColor = false;
 }
 
 class GridView : VerticalLayout
@@ -78,6 +98,7 @@ class GridView : VerticalLayout
     CanvasWidget canvasWidget() { return canvas; }
 
     Signal!EditToggleHandler onToggle;
+    Signal!RefreshStuffHandler onRefresh;
 
 protected:
     void preDraw(CanvasWidget source, DrawBuf buf, Rect huh) { }
@@ -148,7 +169,7 @@ private:
                 prefs.lastJson = filename;
                 keysDisp = loadJsonFile(json);
                 setDrawables(keysDisp);
-                invalidate();
+                onRefresh(this);
             };
             dlg.show();
             return true;
@@ -184,8 +205,7 @@ private:
             Window wnd = constructSettingsWidget(w);
             wnd.onClose = delegate()
             {
-                /*reloadSettings();
-                figureOutWindowSize();*/
+                onRefresh(this);
             };
             return true;
         };

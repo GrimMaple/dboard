@@ -4,8 +4,10 @@ import dlangui;
 
 import widgets.gridview;
 import keys;
+import keyboard;
 import util;
 import preferences;
+import ui;
 
 class EditableView : GridView
 {
@@ -13,6 +15,7 @@ class EditableView : GridView
     {
         super(id);
         popupMenu = constructMainMenuInEditing(window, canvas);
+        KeyHook.get().OnAction = &onKeyHook;
     }
 
 protected:
@@ -49,9 +52,12 @@ protected:
         }
         if(event.lbutton.doubleClick && !changingName && !changingHotkey)
         {
+            if(nameEditing !is null)
+                nameEditing.resetOverrideColor();
             nameEditing = selectDispAtPosition(Point(event.x, event.y));
             if(nameEditing !is null)
             {
+                nameEditing.setOverrideColor(0x0000AAFF);
                 changingHotkey = true;
             }
             return true;
@@ -60,6 +66,7 @@ protected:
         {
             if(changingHotkey)
             {
+                nameEditing.resetOverrideColor();
                 changingHotkey = false;
                 nameEditing = null;
                 return true;
@@ -215,6 +222,13 @@ private:
         c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, 0x0);
     }
 
+    void storeData()
+    {
+        keysDisp = new KeyDisplay[drawables.length];
+        for(int i = 0; i < drawables.length; i++)
+            keysDisp[i] = drawables[i].disp;
+    }
+
     void drawGrid(DrawBuf buf)
     {
         int x = keyOffset;
@@ -231,7 +245,7 @@ private:
         }
     }
 
-    KeyDisplay* selectDispAtPosition(in Point loc)
+    KeyDrawable selectDispAtPosition(in Point loc)
     {
         foreach(i, drw; drawables)
         {
@@ -239,7 +253,7 @@ private:
             if(withinGridRange(loc.y, disp.locy, disp.locy + disp.h) &&
                 withinGridRange(loc.x, disp.locx, disp.locx + disp.w))
             {
-                return &(cast(KeyDrawable)drw).disp;
+                return drw;
             }
         }
         return null;
@@ -250,7 +264,7 @@ private:
         if(changingName && nameEditing)
         {
             changingName = false;
-            nameEditing.visibleString = vl.childById!EditLine("editText").text;
+            nameEditing.disp.visibleString = vl.childById!EditLine("editText").text;
             nameEditing = null;
             vl.removeChild("editText");
             vl.invalidate();
@@ -294,7 +308,7 @@ private:
         if(nameEditing !is null)
         {
             vl.addChild(textEdit);
-            textEdit.text = nameEditing.visibleString();
+            textEdit.text = nameEditing.disp.visibleString();
             textEdit.visibility = Visibility.Visible;
             changingName = true;
             textEdit.setFocus();
@@ -312,6 +326,7 @@ private:
         mainMenu.add(sub);
         sub.menuItemClick = delegate(MenuItem item)
         {
+            storeData();
             onToggle(this);
             return true;
         };
@@ -333,6 +348,29 @@ private:
         return mainMenu;
     }
 
+    void onKeyHook(int vkCode, KeyState state)
+    {
+        if(changingHotkey)
+        {
+            nameEditing.disp.keyCode = vkCode;
+            nameEditing.resetOverrideColor();
+            nameEditing = null;
+            changingHotkey = false;
+        }
+        if(addMode && state == KeyState.Down)
+        {
+            if(n.keyCode == 0x1B && vkCode == 0x1B) // ESCAPE
+            {
+                addMode = false;
+            }
+            else
+            {
+                n.keyCode = vkCode;
+            }
+        }
+        onRefresh(this);
+    }
+
     bool hasOffset = false;
     int xoffs = 0, yoffs = 0;
 
@@ -342,7 +380,8 @@ private:
     bool dragBottom = false;
     KeyDisplay* drag = null;
 
-    KeyDisplay* nameEditing = null;
+    //KeyDisplay* nameEditing = null;
+    KeyDrawable nameEditing = null;
 
     bool addMode = false;
     bool changingName = false;

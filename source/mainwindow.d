@@ -35,6 +35,7 @@ private:
         auto grid = new GridView();
         grid.setDrawables(keysDisp);
         grid.onToggle = &onResetToEdit;
+        grid.onRefresh = &onRefresh;
         window.mainWidget = grid;
         KeyHook.get().OnAction = &onKeyHook;
         reloadSettings();
@@ -45,7 +46,10 @@ private:
         auto widget = new GridView();
         widget.setDrawables(keysDisp);
         widget.onToggle = &onResetToEdit;
+        widget.onRefresh = &onRefresh;
+        KeyHook.get().OnAction = &onKeyHook;
         window.executeInUiThread(() => window.mainWidget = widget);
+        onRefresh(null);
     }
 
     void onResetToEdit(Widget source)
@@ -53,7 +57,15 @@ private:
         auto widget = new EditableView();
         widget.setDrawables(keysDisp);
         widget.onToggle = &onResetToNormal;
+        widget.onRefresh = &onRefresh;
         window.executeInUiThread(() => window.mainWidget = widget);
+        onRefresh(null);
+    }
+
+    void onRefresh(Widget source)
+    {
+        figureOutWindowSize();
+        window.invalidate();
     }
 
     auto editableCanvas()
@@ -72,23 +84,6 @@ private:
 
     void onKeyHook(int vkCode, KeyState state)
     {
-        /*if(changingHotkey)
-        {
-            nameEditing.keyCode = vkCode;
-            nameEditing = null;
-            changingHotkey = false;
-        }*/
-        /*if(addMode && state == KeyState.Down)
-        {
-            if(n.keyCode == 0x1B && vkCode == 0x1B) // ESCAPE
-            {
-                addMode = false;
-            }
-            else
-            {
-                n.keyCode = vkCode;
-            }
-        }*/
         code = vkCode;
         keysStates[code] = (state == KeyState.Down) ? true : false;
         gstate = state;
