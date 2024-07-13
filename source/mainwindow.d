@@ -37,6 +37,7 @@ private:
         grid.onToggle = &onResetToEdit;
         grid.onRefresh = &onRefresh;
         window.mainWidget = grid;
+        Platform.instance.uiTheme = "dboard";
         KeyHook.get().OnAction = &onKeyHook;
         reloadSettings();
     }
