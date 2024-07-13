@@ -3,12 +3,16 @@ module widgets.gridview;
 import std.algorithm : each;
 
 import dlangui;
+import dlangui.dialogs.filedlg;
+import dlangui.dialogs.dialog;
 
 import keyboard;
 import keys;
 import preferences;
 import util;
 import widgets.settingswidget;
+import ui;
+import io;
 
 class GridDrawable
 {
@@ -126,23 +130,13 @@ private:
         mainMenu.add(sub);
         sub.menuItemClick = delegate(MenuItem item)
         {
-            /*editMode = !editMode;
-            if(editMode)
-            {
-                c.popupMenu =  constructMainMenuInEditing(w, c);
-            }
-            else
-            {
-            c.popupMenu = constructMainMenu(w, c);
-            }
-            window.executeInUiThread(() => window.mainWidget = editableCanvas());*/
             onToggle(this);
             return true;
         };
 
         load.menuItemClick = delegate(MenuItem item)
         {
-            /*FileDialog dlg = new FileDialog(UIString.fromId("OPEN"), w, null);
+            FileDialog dlg = new FileDialog(UIString.fromId("OPEN"), w, null);
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
@@ -153,17 +147,16 @@ private:
                 string json = readText(filename);
                 prefs.lastJson = filename;
                 keysDisp = loadJsonFile(json);
-                c.invalidate();
-                w.invalidate();
-                figureOutWindowSize();
+                setDrawables(keysDisp);
+                invalidate();
             };
-            dlg.show();*/
+            dlg.show();
             return true;
         };
 
         save.menuItemClick = delegate(MenuItem item)
         {
-            /*FileDialog dlg = new FileDialog(UIString.fromRaw("Save file"), w, null, DialogFlag.Modal | DialogFlag.Resizable
+            FileDialog dlg = new FileDialog(UIString.fromRaw("Save file"), w, null, DialogFlag.Modal | DialogFlag.Resizable
                 | FileDialogFlag.ConfirmOverwrite | FileDialogFlag.Save);
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.filename = "mykeyboard";
@@ -180,10 +173,9 @@ private:
                 string json = saveJson(keysDisp);
                 write(filename, json);
                 prefs.lastJson = filename;
-                c.invalidate();
-                w.invalidate();
+                invalidate();
             };
-            dlg.show();*/
+            dlg.show();
             return true;
         };
 
