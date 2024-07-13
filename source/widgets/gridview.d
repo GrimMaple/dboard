@@ -157,10 +157,12 @@ private:
 
         load.menuItemClick = delegate(MenuItem item)
         {
+            Platform.instance.uiTheme = "theme_default";
             FileDialog dlg = new FileDialog(UIString.fromId("OPEN"), w, null);
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
+                Platform.instance.uiTheme = "dboard";
                 import std.file : readText;
                 if(result.id != ACTION_OPEN.id)
                     return;
@@ -181,8 +183,10 @@ private:
                 | FileDialogFlag.ConfirmOverwrite | FileDialogFlag.Save);
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.filename = "mykeyboard";
+            Platform.instance.uiTheme = "theme_default";
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
+                Platform.instance.uiTheme = "dboard";
                 import std.file : write;
                 import std.algorithm : endsWith;
                 if(result.id != ACTION_SAVE.id)

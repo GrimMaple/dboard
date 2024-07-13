@@ -4,7 +4,7 @@
     ],
     "copyright": "Copyright © 2021, Grim Maple",
     "dependencies": {
-        "dlangui": "~>0.10.4",
+        "dlangui": "~>0.10.8",
         "mud": "~>0.2.0",
         "x11": "~>1.0.21"
     },

@@ -2,7 +2,9 @@
 <theme 
     id="dboard"
     parent="theme_default"
-    >
+    fontSize="16"
+    fontFace="Segoue UI"
+    fontWeight="bold">
 
     <color id="window_background" value="#37313B"/>
     <color id="dialog_background" value="#37313B"/>
@@ -94,6 +96,4 @@
         margins="1pt,1pt,1pt,1pt">
         <state state_enabled="true" state_hovered="true" backgroundColor="#9CA0AB" textColor="#666666"/>
     </style>
-
-
 </theme>
