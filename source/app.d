@@ -62,7 +62,8 @@ extern(C) int UIAppMain()
     {
         // I will fix this later, maybe...
         import keyboard;
-        KeyHook.get().exit();
+        import platform.linux;
+        (cast(KeyHookLinux)KeyHook.get()).exit();
     }
     return res;
 }

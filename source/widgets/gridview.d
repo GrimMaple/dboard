@@ -52,7 +52,7 @@ class KeyDrawable : GridDrawable
         c.font.drawText(buf, x + pxWidth/2 - sz.x/2, y+pxHeight/2 - sz.y/2, s, textColor);
     }
 
-    @property bool pressed() { return pressedKeys[disp.keyCode]; }
+    @property bool pressed() { return KeyHook.get.isKeyPressed(disp.keyCode); }
 
     void setOverrideColor(uint color)
     {

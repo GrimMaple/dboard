@@ -2,6 +2,11 @@ module preferences;
 
 import mud.serialization;
 
+version(Windows)
+    private enum string defaultFont = "Unispace";
+else
+    private enum string defaultFont = "";
+
 struct Preferences
 {
     @serializable string lastJson;
@@ -12,7 +17,7 @@ struct Preferences
     @serializable string textPressedColor = "AAAAAA";
     @serializable int keySize = 48;
     @serializable int keyOffset = 3;
-    @serializable string fontFace = "Unispace";
+    @serializable string fontFace = defaultFont;
     @serializable int fontSize = 14;
     @serializable int fontWeight = 0;
     @serializable bool fontItalic = false;
