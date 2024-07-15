@@ -15,6 +15,14 @@ float threeWayRound(float input)
     return input;
 }
 
+string keyboardsPath()
+{
+    import std.file : thisExePath;
+    import std.path;
+
+    return absolutePath(thisExePath).dirName() ~ "/keyboards";
+}
+
 /// Is `f` whole
 bool isWhole(T)(T f) if(__traits(isFloating, T))
 {

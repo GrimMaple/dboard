@@ -5,7 +5,7 @@ import keyboard;
 version(Windows):
 import core.sys.windows.windows;
 
-class KeyHookWin : KeyHook
+class KeyHookWindows : KeyHook
 {
     private enum ScanCodes
     {
@@ -26,7 +26,7 @@ class KeyHookWin : KeyHook
         NumPadPeriod = 0x53
     }
 
-    private this() nothrow
+    this() nothrow
     {
         hHook = SetHook();
         assert(hHook !is null);
@@ -72,31 +72,36 @@ class KeyHookWin : KeyHook
             {
                 // Windows doesn't distinguish NumPad enter and "normal" enter. If a numpad enter is pressed,
                 // an "extended" KeyDown event is generated
-                if(vkCode in KeyHook.get().extendedConversion)
-                    vkCode = KeyHook.get().extendedConversion[vkCode];
+                if(vkCode in get().extendedConversion)
+                    vkCode = get().extendedConversion[vkCode];
             }
-            else if(kb.scanCode in KeyHook.get().scanCodes)
+            else if(kb.scanCode in get().scanCodes)
             {
                 // Normally Virtual Keys (VKs) don't distinguish between numpad and "real" keys. This is a hack
                 // that uses scan codes to understand if the pressed key is a numpad or not
-                vkCode = KeyHook.get().scanCodes[kb.scanCode];
+                vkCode = get().scanCodes[kb.scanCode];
             }
             try
             {
-                pressedKeys[vkCode] = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
-                if(KeyHook.get().OnAction !is null)
-                    KeyHook.get().OnAction(vkCode, (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? KeyState.Down : KeyState.Up);
+                get().pressedKeys[vkCode] = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
+                if(get().OnAction !is null)
+                    get().OnAction(vkCode, (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? KeyState.Down : KeyState.Up);
             }
             catch(Exception ex)
             {
                 // ...
             }
         }
-        HHOOK hook = KeyHook.get().hHook;
+        HHOOK hook = get().hHook;
         return CallNextHookEx(hook, nCode, wParam, lParam);
     }
 
     private DWORD[DWORD] extendedConversion;
 
     private DWORD[DWORD] scanCodes;
+
+    private static KeyHookWindows get() nothrow
+    {
+        return cast(KeyHookWindows)KeyHook.get;
+    }
 }

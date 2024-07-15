@@ -161,6 +161,7 @@ private:
             Platform.instance.uiTheme = "theme_default";
             FileDialog dlg = new FileDialog(UIString.fromId("OPEN"), w, null);
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
+            dlg.path = keyboardsPath;
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
                 Platform.instance.uiTheme = "dboard";
@@ -185,6 +186,7 @@ private:
             dlg.addFilter(FileFilterEntry(UIString.fromRaw("JSON Files (*.json)"), "*.json"));
             dlg.filename = "mykeyboard";
             Platform.instance.uiTheme = "theme_default";
+            dlg.path = keyboardsPath;
             dlg.dialogResult = delegate(Dialog dialog, const Action result)
             {
                 Platform.instance.uiTheme = "dboard";

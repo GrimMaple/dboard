@@ -3,7 +3,7 @@ module preferences;
 import mud.serialization;
 
 version(Windows)
-    private enum string defaultFont = "Unispace";
+    private enum string defaultFont = "Impact";
 else
     private enum string defaultFont = "";
 
